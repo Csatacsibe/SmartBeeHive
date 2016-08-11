@@ -7,8 +7,19 @@
 
 #include "SIM808_driver.h"
 
+void GPS_ant_pwr(boolean_t val)
+{
+  if(val == True)
+  {
+    HAL_GPIO_WritePin(GPS_ANT_EN_GPIO_Port, GPS_ANT_EN_Pin, GPIO_PIN_SET);
+  }
+  else if(val == False)
+  {
+    HAL_GPIO_WritePin(GPS_ANT_EN_GPIO_Port, GPS_ANT_EN_Pin, GPIO_PIN_RESET);
+  }
+}
+
 void SIM808_init()
 {
-  /* Set default pin states */
-  HAL_GPIO_WritePin(GPS_ANT_EN_GPIO_Port, GPS_ANT_EN_Pin, GPIO_PIN_RESET);
+  GPS_ant_pwr(False); // default value: GPS antenna pwr off
 }
