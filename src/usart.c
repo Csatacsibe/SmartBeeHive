@@ -28,7 +28,6 @@ void MX_USART1_UART_Init(void)
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
-
   GPIO_InitTypeDef GPIO_InitStruct;
   if(huart->Instance==USART1)
   {
@@ -52,7 +51,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
-
   if(huart->Instance==USART1)
   {
     __USART1_CLK_DISABLE();

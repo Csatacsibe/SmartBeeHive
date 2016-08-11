@@ -5,13 +5,19 @@
  *      Author: Bence
  */
 
+
 #include "stm32f0xx.h"
 #include "stm32f0xx_hal_cortex.h"
 #include "stm32f0xx_hal.h"
+
+/* STM32 peripherals */
 #include "adc.h"
-#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "eeprom.h"
+
+/* Smart Bee Hive board drivers */
+#include "Si7021_driver.h"
 
 void SystemClock_Config(void);
 
@@ -25,10 +31,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC_Init();
-  MX_I2C1_Init();
-  MX_USART1_UART_Init();
-
+  //MX_ADC_Init();
+  //MX_I2C1_Init();
+  //MX_USART1_UART_Init();
 
   while (1)
   {

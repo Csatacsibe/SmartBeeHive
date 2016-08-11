@@ -12,7 +12,6 @@ I2C_HandleTypeDef hi2c1;
 
 void MX_I2C1_Init(void)
 {
-
   hi2c1.Instance = I2C1;
   hi2c1.Init.Timing = 0x2000090E;
   hi2c1.Init.OwnAddress1 = 0;
@@ -25,18 +24,16 @@ void MX_I2C1_Init(void)
   HAL_I2C_Init(&hi2c1);
 
   HAL_I2CEx_AnalogFilter_Config(&hi2c1, I2C_ANALOGFILTER_ENABLED);
-
 }
 
 void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 {
-
   GPIO_InitTypeDef GPIO_InitStruct;
   if(hi2c->Instance==I2C1)
   {
     /**I2C1 GPIO Configuration    
     PA9     ------> I2C1_SCL
-    PA10     ------> I2C1_SDA 
+    PA10    ------> I2C1_SDA
     */
     GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -51,16 +48,14 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
 {
-
   if(hi2c->Instance==I2C1)
   {
     __I2C1_CLK_DISABLE();
   
     /**I2C1 GPIO Configuration    
     PA9     ------> I2C1_SCL
-    PA10     ------> I2C1_SDA 
+    PA10    ------> I2C1_SDA
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
-
   }
 } 

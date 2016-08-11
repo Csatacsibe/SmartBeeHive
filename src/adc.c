@@ -39,12 +39,10 @@ void MX_ADC_Init(void)
 
   sConfig.Channel = ADC_CHANNEL_6;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
-
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
-
   GPIO_InitTypeDef GPIO_InitStruct;
   if(hadc->Instance==ADC1)
   {
@@ -67,7 +65,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
 void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 {
-
   if(hadc->Instance==ADC1)
   {
     __ADC1_CLK_DISABLE();
@@ -80,6 +77,5 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     HAL_GPIO_DeInit(GPIOA, GAUGE_OUT_Pin|I_SUPP_Pin|V_BAT_Pin);
 
     HAL_NVIC_DisableIRQ(ADC1_IRQn);
-
   }
 }
