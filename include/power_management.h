@@ -40,6 +40,6 @@ void batt_charger_set(boolean_t val);
 GPIO_PinState get_charger_stat(void);
 
 // set default pin values
-void power_init(void);
+void power_mngt_init(void);
 
 #endif /* POWER_MANAGEMENT_H_ */

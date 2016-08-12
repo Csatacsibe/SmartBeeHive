@@ -36,6 +36,6 @@ void w_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buf
 void reset_FXAS21002C()
 {
   HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_RESET);
-  HAL_Delay(10);
+  HAL_Delay(150);
   HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
 }

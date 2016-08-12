@@ -24,4 +24,16 @@ void SIM808_init(void);
  */
 void GPS_ant_pwr(boolean_t val);
 
+/*
+ *  Drives PWRKEY low for 2 second
+ *  to turn ON/OFF the module
+ */
+void switch_SIM808(void);
+
+/*
+ *  Drives RST low for 150 milisecond
+ *  to turn reset the module
+ */
+void reset_SIM808(void);
+
 #endif /* SIM808_DRIVER_H_ */

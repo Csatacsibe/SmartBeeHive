@@ -23,3 +23,17 @@ void SIM808_init()
 {
   GPS_ant_pwr(False); // default value: GPS antenna pwr off
 }
+
+void switch_SIM808()
+{
+  HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_RESET);
+  HAL_Delay(2000);
+  HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_SET);
+}
+
+void reset_SIM808()
+{
+  HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_RESET);
+  HAL_Delay(150);
+  HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);
+}

@@ -18,6 +18,9 @@
 
 /* Smart Bee Hive board drivers */
 #include "Si7021_driver.h"
+#include "power_management.h"
+#include "FXAS21002C_driver.h"
+#include "SIM808_driver.h"
 
 void SystemClock_Config(void);
 
@@ -34,6 +37,16 @@ int main(void)
   //MX_ADC_Init();
   //MX_I2C1_Init();
   //MX_USART1_UART_Init();
+
+  /* Initialize SBH peripherals */
+  power_mngt_init();
+  SIM808_init();
+
+  HAL_Delay(1000);
+
+  reset_SIM808();
+
+  switch_SIM808();
 
   while (1)
   {
