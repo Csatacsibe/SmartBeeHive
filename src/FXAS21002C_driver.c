@@ -7,6 +7,11 @@
 
 #include "FXAS21002C_driver.h"
 
+#include "i2c.h"
+#include "gpio.h"
+
+#include "constants.h"
+
 static const uint16_t i2c_addr = (0x20<<1); // FXAS21002 I2C address
 
 void r_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buffer[])

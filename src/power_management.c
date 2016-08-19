@@ -1,5 +1,10 @@
 #include "power_management.h"
 
+#include "gpio.h"
+#include "adc.h"
+
+#include "constants.h"
+
 void _4V2_converter_set(boolean_t val)
 {
   if(val == True)

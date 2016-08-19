@@ -8,6 +8,8 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
+#include "stm32f0xx.h"
+
 typedef enum boolean
 {
 	True  = 1,

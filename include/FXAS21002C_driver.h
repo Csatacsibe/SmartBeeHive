@@ -8,9 +8,6 @@
 #ifndef FXAS21002C_DRIVER_H_
 #define FXAS21002C_DRIVER_H_
 
-#include "i2c.h"
-#include "gpio.h"
-#include "constants.h"
 #include "types.h"
 
 typedef enum FXAS21002C_registers

@@ -8,7 +8,6 @@
 #ifndef SI7021_H_
 #define SI7021_H_
 
-#include "i2c.h"
 #include "types.h"
 
 typedef enum Si7021_commands

@@ -8,9 +8,6 @@
 #ifndef POWER_MANAGEMENT_H_
 #define POWER_MANAGEMENT_H_
 
-#include "gpio.h"
-#include "adc.h"
-#include "constants.h"
 #include "types.h"
 
 /*

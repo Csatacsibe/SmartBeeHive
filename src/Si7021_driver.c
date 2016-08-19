@@ -7,12 +7,14 @@
 
 #include "Si7021_driver.h"
 
+#include "i2c.h"
+
 static const uint16_t i2c_addr = (0x40<<1); // Si7021 I2C address
 
 static const uint8_t UR_bitmask = 0x3A;     // Reset Settings = 0011_1010, (reserved bits)
 static const uint8_t RES0 = 0;
 static const uint8_t RES1 = 7;
-static const uint8_t VDDS = 6;    			// read only
+static const uint8_t VDDS = 6;    		    	// read only
 static const uint8_t HTRE = 2;
 
 static const uint8_t HEATER0 = 0;
@@ -112,11 +114,11 @@ void r_both_Si7021(float* humidity, float* temperature)
 
 int8_t r_firmware_rev_Si7021()
 {
-    uint8_t cmd[2];
-    uint8_t data;
+  uint8_t cmd[2];
+  uint8_t data;
 
-    cmd[0] = R_Firm_rev1;
-    cmd[1] = R_Firm_rev2;
+  cmd[0] = R_Firm_rev1;
+  cmd[1] = R_Firm_rev2;
 
 	HAL_I2C_Master_Transmit(&hi2c1, i2c_addr, cmd, 2, 10000);
 	HAL_I2C_Master_Receive(&hi2c1, i2c_addr, &data, 1, 10000);
