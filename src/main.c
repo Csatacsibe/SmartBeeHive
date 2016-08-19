@@ -12,9 +12,10 @@
 
 /* STM32 peripherals */
 #include "adc.h"
-#include "usart.h"
 #include "gpio.h"
 #include "eeprom.h"
+#include "usart.h"
+#include "i2c.h"
 
 /* Smart Bee Hive board drivers */
 #include "Si7021_driver.h"
@@ -36,17 +37,14 @@ int main(void)
   MX_GPIO_Init();
   //MX_ADC_Init();
   //MX_I2C1_Init();
-  //MX_USART1_UART_Init();
+  MX_USART1_UART_Init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
 
-  HAL_Delay(1000);
-
   reset_SIM808();
-
-  switch_SIM808();
+  power_SIM808();
 
   while (1)
   {
