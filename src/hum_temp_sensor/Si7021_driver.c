@@ -5,9 +5,9 @@
  *      Author: Bence
  */
 
-#include "Si7021_driver.h"
+#include <hum_temp_sensor/Si7021_driver.h>
+#include <STM32_bsp/i2c.h>
 
-#include "i2c.h"
 
 static const uint16_t i2c_addr = (0x40<<1); // Si7021 I2C address
 

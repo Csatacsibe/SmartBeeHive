@@ -5,7 +5,7 @@
  *      Author: Bence
  */
 
-#include "gpio.h"
+#include <STM32_bsp/gpio.h>
 
 /** Configure pins as 
         * Analog 

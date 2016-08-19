@@ -5,13 +5,10 @@
  *      Author: Bence
  */
 
-#include "SIM808_driver.h"
-
-#include "usart.h"
-#include "gpio.h"
-
-#include "constants.h"
-
+#include <GPRS_GSM/SIM808_driver.h>
+#include <STM32_bsp/constants.h>
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/usart.h>
 #include "string.h"
 
 static boolean_t get_SIM808_status(uint8_t timeout);

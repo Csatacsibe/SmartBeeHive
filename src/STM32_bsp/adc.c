@@ -5,8 +5,8 @@
  *      Author: Bence
  */
 
-#include "adc.h"
-#include "gpio.h"
+#include <STM32_bsp/adc.h>
+#include <STM32_bsp/gpio.h>
 
 ADC_HandleTypeDef hadc;
 

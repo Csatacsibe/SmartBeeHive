@@ -5,9 +5,9 @@
  *      Author: Bence
  */
 
-#include "usart.h"
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/usart.h>
 
-#include "gpio.h"
 
 UART_HandleTypeDef huart1;
 

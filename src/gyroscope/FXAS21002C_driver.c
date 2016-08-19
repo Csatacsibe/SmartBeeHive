@@ -5,12 +5,11 @@
  *      Author: Bence
  */
 
-#include "FXAS21002C_driver.h"
+#include <gyroscope/FXAS21002C_driver.h>
+#include <STM32_bsp/constants.h>
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/i2c.h>
 
-#include "i2c.h"
-#include "gpio.h"
-
-#include "constants.h"
 
 static const uint16_t i2c_addr = (0x20<<1); // FXAS21002 I2C address
 

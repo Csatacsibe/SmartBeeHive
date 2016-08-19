@@ -5,8 +5,8 @@
  *      Author: Bence
  */
 
-#include "i2c.h"
-#include "gpio.h"
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/i2c.h>
 
 I2C_HandleTypeDef hi2c1;
 

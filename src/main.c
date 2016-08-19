@@ -5,23 +5,23 @@
  *      Author: Bence
  */
 
-
 #include "stm32f0xx.h"
 #include "stm32f0xx_hal_cortex.h"
 #include "stm32f0xx_hal.h"
 
 /* STM32 peripherals */
-#include "adc.h"
-#include "gpio.h"
-#include "eeprom.h"
-#include "usart.h"
-#include "i2c.h"
+#include <STM32_bsp/adc.h>
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/i2c.h>
+#include <STM32_bsp/usart.h>
 
-/* Smart Bee Hive board drivers */
-#include "Si7021_driver.h"
+/* SBH peripherals*/
 #include "power_management.h"
-#include "FXAS21002C_driver.h"
-#include "SIM808_driver.h"
+#include <gyroscope/FXAS21002C_driver.h>
+#include <GPRS_GSM/SIM808_driver.h>
+#include <hum_temp_sensor/Si7021_driver.h>
+
+#include "eeprom.h"
 
 void SystemClock_Config(void);
 
