@@ -23,7 +23,25 @@
 
 #include "eeprom.h"
 
+#include "math.h"
+
 void SystemClock_Config(void);
+
+static void debug_print_float(float value);
+
+static void debug_print_float(float value)
+{
+  char str[100];
+
+  int d1 = value;
+  float f2 = value - d1;
+  int d2 = trunc(f2 * 1000);
+
+  sprintf(str, "=%d.%03d", d1, d2);
+
+  put_s_SIM808((uint8_t*)str);
+  HAL_Delay(5);
+}
 
 int main(void)
 {
@@ -35,20 +53,28 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  //MX_ADC_Init();
-  //MX_I2C1_Init();
+  MX_ADC_Init();
+  MX_I2C1_Init();
   MX_USART1_UART_Init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
 
-  reset_SIM808();
-  power_SIM808();
+  //reset_SIM808();
+  //power_SIM808();
+
+  float vdd, vbat, idd = 0;
 
   while (1)
   {
+    vdd  = calculate_MCU_Vdd();
+    vbat = r_battery_voltage();
+    idd  = r_supply_current();
 
+    debug_print_float(vdd);
+    debug_print_float(vbat);
+    //debug_print_float(idd);
   }
 }
 

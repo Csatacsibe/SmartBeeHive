@@ -76,3 +76,8 @@ float r_supply_current()
 
   return current;
 }
+
+float r_mcu_temp()
+{
+  return 0;
+}

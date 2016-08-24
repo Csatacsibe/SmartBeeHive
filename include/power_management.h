@@ -60,4 +60,9 @@ float r_battery_voltage(void);
  */
 float r_supply_current(void);
 
+/*
+ * Reads the MCU internal temperature sensor.
+ */
+float r_mcu_temp(void);
+
 #endif /* POWER_MANAGEMENT_H_ */
