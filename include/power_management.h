@@ -8,6 +8,8 @@
 #ifndef POWER_MANAGEMENT_H_
 #define POWER_MANAGEMENT_H_
 
+#define VREFINT_CAL_ADDR   0x1FFFF7BA
+
 #include "types.h"
 
 /*
@@ -36,7 +38,26 @@ void batt_charger_set(boolean_t val);
  */
 GPIO_PinState get_charger_stat(void);
 
-// set default pin values
+/*
+ *  set default pin values
+ */
 void power_mngt_init(void);
+
+/*
+ * Reads the internal voltage reference,
+ * the internal reference voltage calibration
+ * value and calculates the supply voltage in Volts.
+ */
+float calculate_MCU_Vdd(void);
+
+/*
+ * Returns the battery voltage in Volts.
+ */
+float r_battery_voltage(void);
+
+/*
+ * Returns the board supply current in mA.
+ */
+float r_supply_current(void);
 
 #endif /* POWER_MANAGEMENT_H_ */

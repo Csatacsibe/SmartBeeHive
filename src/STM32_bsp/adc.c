@@ -29,15 +29,21 @@ void MX_ADC_Init(void)
   hadc.Init.Overrun = OVR_DATA_PRESERVED;
   HAL_ADC_Init(&hadc);
 
-  sConfig.Channel = ADC_CHANNEL_4;
-  sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.Channel = STRAIN_GAUGE;
+  sConfig.Rank = ADC_RANK_NONE;
+  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
-  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Channel = SUPPLY_CURRENT;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
-  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Channel = BATTERY_VOLTAGE;
+  HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  HAL_ADC_ConfigChannel(&hadc, &sConfig);
+
+  sConfig.Channel = ADC_CHANNEL_VREFINT;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
 }
 
@@ -79,3 +85,100 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     HAL_NVIC_DisableIRQ(ADC1_IRQn);
   }
 }
+
+void config_ext_channel_ADC(uint32_t channel, boolean_t val)
+{
+  ADC_ChannelConfTypeDef sConfig;
+
+  sConfig.Channel = channel;
+  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+
+  if(True == val)
+  {
+    sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
+  }
+  else
+  {
+    sConfig.Rank = ADC_RANK_NONE;
+  }
+
+  HAL_ADC_ConfigChannel(&hadc, &sConfig);
+}
+
+uint32_t r_single_ext_channel_ADC(uint32_t channel)
+{
+  uint32_t digital_result;
+
+  config_ext_channel_ADC(channel, True);
+
+  HAL_ADCEx_Calibration_Start(&hadc);
+
+  HAL_ADC_Start(&hadc);
+  HAL_ADC_PollForConversion(&hadc, 1000);
+  digital_result = HAL_ADC_GetValue(&hadc);
+  HAL_ADC_Stop(&hadc);
+
+  config_ext_channel_ADC(channel, False);
+
+  return digital_result;
+}
+
+void config_int_channel_ADC(uint32_t channel, boolean_t val)
+{
+  ADC_ChannelConfTypeDef sConfig;
+  sConfig.Channel = channel;
+
+  if(val == True)
+  {
+    if(channel == ADC_CHANNEL_VREFINT)
+    {
+      ADC->CCR |= ADC_CCR_VREFEN;
+      hadc.Instance->CHSELR = (uint32_t)(ADC_CHSELR_CHSEL17);
+    }
+    else if(channel == ADC_CHANNEL_TEMPSENSOR)
+    {
+      ADC->CCR |= ADC_CCR_TSEN;
+      hadc.Instance->CHSELR = (uint32_t)(ADC_CHSELR_CHSEL16);
+    }
+
+    sConfig.Rank          = ADC_RANK_CHANNEL_NUMBER;
+    sConfig.SamplingTime  = ADC_SAMPLETIME_239CYCLES_5;
+  }
+  else if(val == False)
+  {
+    if(channel == ADC_CHANNEL_VREFINT)
+    {
+      ADC->CCR &= ~ADC_CCR_VREFEN;
+      hadc.Instance->CHSELR = 0;
+    }
+    else if(channel == ADC_CHANNEL_TEMPSENSOR)
+    {
+      ADC->CCR &= ~ADC_CCR_TSEN;
+      hadc.Instance->CHSELR = 0;
+    }
+
+    sConfig.Rank          = ADC_RANK_NONE;
+    sConfig.SamplingTime  = ADC_SAMPLETIME_239CYCLES_5;
+  }
+
+  HAL_ADC_ConfigChannel(&hadc,&sConfig);
+}
+
+uint32_t r_single_int_channel_ADC(uint32_t channel)
+{
+  uint32_t digital_result;
+
+  config_int_channel_ADC(channel, True);
+
+  HAL_ADCEx_Calibration_Start(&hadc);
+
+  HAL_ADC_Start(&hadc);
+  HAL_ADC_PollForConversion(&hadc, 1000);
+  digital_result = HAL_ADC_GetValue(&hadc);
+  HAL_ADC_Stop(&hadc);
+
+  config_int_channel_ADC(channel, False);
+
+  return digital_result;
+}
+
