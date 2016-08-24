@@ -64,16 +64,18 @@ int main(void)
   //reset_SIM808();
   //power_SIM808();
 
-  float vdd, vbat, idd = 0;
+  float vdd, vbat, idd, temp;
 
   while (1)
   {
     vdd  = calculate_MCU_Vdd();
     vbat = r_battery_voltage();
     idd  = r_supply_current();
+    temp = r_MCU_temp();
 
     debug_print_float(vdd);
     debug_print_float(vbat);
+    debug_print_float(temp);
     //debug_print_float(idd);
   }
 }

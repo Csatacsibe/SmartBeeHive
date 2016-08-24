@@ -8,7 +8,9 @@
 #ifndef POWER_MANAGEMENT_H_
 #define POWER_MANAGEMENT_H_
 
-#define VREFINT_CAL_ADDR   0x1FFFF7BA
+#define VREFINT_CAL_ADDR   ((uint16_t*) ((uint32_t) 0x1FFFF7BA))
+#define TEMP30_CAL_ADDR    ((uint16_t*) ((uint32_t) 0x1FFFF7B8))
+#define TEMP110_CAL_ADDR   ((uint16_t*) ((uint32_t) 0x1FFFF7C2))
 
 #include "types.h"
 
@@ -62,7 +64,8 @@ float r_supply_current(void);
 
 /*
  * Reads the MCU internal temperature sensor.
+ * Returns the temperature in °C.
  */
-float r_mcu_temp(void);
+float r_MCU_temp(void);
 
 #endif /* POWER_MANAGEMENT_H_ */
