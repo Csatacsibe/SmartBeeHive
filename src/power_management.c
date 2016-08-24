@@ -53,7 +53,7 @@ float calculate_MCU_Vdd()
 
 float r_battery_voltage()
 {
-  float vbat = 0;
+  float vbat;
   float mcu_vdd = calculate_MCU_Vdd();
   uint16_t digital_val;
 
