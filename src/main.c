@@ -60,23 +60,25 @@ int main(void)
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
+  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
+
+  HAL_Delay(5000);
 
   //reset_SIM808();
   //power_SIM808();
 
   float vdd, vbat, idd, temp;
+  uint8_t buffer[20];
 
   while (1)
   {
-    vdd  = calculate_MCU_Vdd();
-    vbat = r_battery_voltage();
-    idd  = r_supply_current();
-    temp = r_MCU_temp();
+    //vdd  = calculate_MCU_Vdd();
+    //vbat = r_battery_voltage();
+    //idd  = r_supply_current();
+    //temp = r_MCU_temp();
 
-    debug_print_float(vdd);
-    debug_print_float(vbat);
-    debug_print_float(temp);
-    //debug_print_float(idd);
+    r_regs_FXAS21002C(WHO_AM_I, 1, buffer);
+    HAL_Delay(100);
   }
 }
 
