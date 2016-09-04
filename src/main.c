@@ -69,15 +69,17 @@ int main(void)
 
   float vdd, vbat, idd, temp;
   uint8_t buffer[20];
+  float temp2, humi;
 
   while (1)
   {
-    //vdd  = calculate_MCU_Vdd();
-    //vbat = r_battery_voltage();
-    //idd  = r_supply_current();
-    //temp = r_MCU_temp();
+    vdd  = calculate_MCU_Vdd();
+    vbat = r_battery_voltage();
+    idd  = r_supply_current();
+    temp = r_MCU_temp();
 
-    r_regs_FXAS21002C(WHO_AM_I, 1, buffer);
+    //r_regs_FXAS21002C(WHO_AM_I, 1, buffer);
+    r_both_Si7021(&temp2, &humi);
     HAL_Delay(100);
   }
 }
