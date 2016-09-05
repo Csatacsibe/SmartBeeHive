@@ -8,6 +8,7 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_it.h"
+#include "GPRS_GSM/SIM808_driver.h"
 
 extern ADC_HandleTypeDef hadc;
 extern UART_HandleTypeDef huart1;
@@ -30,4 +31,13 @@ void ADC1_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&huart1);
+}
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if ( huart->Instance == USART1)
+  {
+    rx_cmplt = True;
+  }
 }

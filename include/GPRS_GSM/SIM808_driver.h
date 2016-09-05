@@ -10,7 +10,12 @@
 
 #include "types.h"
 
-// set default pin values
+extern uint8_t rx_buffer_SIM808[160];
+extern boolean_t rx_cmplt;
+
+/*
+ *  set default pin values
+ */
 void SIM808_init(void);
 
 /*
@@ -43,17 +48,6 @@ void put_c_SIM808(uint8_t c);
  *  Sends a string to the module.
  */
 void put_s_SIM808(uint8_t* string);
-
-/*
- *  power on/off GPS antenna
- *
- *  params:
- *  s:       receive buffer
- *  timeout: response timeout value
- *
- *  return:  see HAL_StatusTypedef doc
- */
-HAL_StatusTypeDef get_s_SIM808(uint8_t* s, uint8_t size, uint8_t timeout);
 
 /*
  *  Sets command echo mode

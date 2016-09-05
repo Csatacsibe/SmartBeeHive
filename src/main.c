@@ -39,7 +39,7 @@ static void debug_print_float(float value)
 
   sprintf(str, "=%d.%03d", d1, d2);
 
-  put_s_SIM808((uint8_t*)str);
+  //put_s_SIM808((uint8_t*)str);
   HAL_Delay(5);
 }
 
@@ -60,26 +60,23 @@ int main(void)
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
-  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
+  FXAS21002C_init();
 
-  HAL_Delay(5000);
-
-  //reset_SIM808();
-  //power_SIM808();
-
-  float vdd, vbat, idd, temp;
-  uint8_t buffer[20];
-  float temp2, humi;
+  /* Local variables */
+  volatile float vdd, vbat, idd, temp_MCU;
+  float temp, humi;
+  uint8_t buffer[10];
 
   while (1)
   {
-    vdd  = calculate_MCU_Vdd();
+    /*vdd  = calculate_MCU_Vdd();
     vbat = r_battery_voltage();
     idd  = r_supply_current();
-    temp = r_MCU_temp();
+    temp_MCU = r_MCU_temp();
 
-    //r_regs_FXAS21002C(WHO_AM_I, 1, buffer);
-    r_both_Si7021(&temp2, &humi);
+    r_both_Si7021(&humi, &temp);*/
+    put_s_SIM808((uint8_t*)"AT\r");
+    HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 5);
     HAL_Delay(100);
   }
 }

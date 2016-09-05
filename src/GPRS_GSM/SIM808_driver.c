@@ -9,30 +9,29 @@
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
 #include <STM32_bsp/usart.h>
+#include <device_management.h>
+
 #include "string.h"
 
-static boolean_t get_SIM808_status(uint8_t timeout);
+uint8_t rx_buffer_SIM808[160];
+boolean_t rx_cmplt = False;
 
-static boolean_t get_SIM808_status(uint8_t timeout)
+static boolean_t get_SIM808_status(uint32_t to);
+
+static boolean_t get_SIM808_status(uint32_t to)
 {
-  uint8_t resp[7];
-
   put_s_SIM808((uint8_t*)"AT\r");
+  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 7);
 
-  if(HAL_OK == get_s_SIM808(resp, 6, timeout))
+  if(waitFor(&rx_cmplt, to))
   {
-    if(strncmp((char*)resp, "\\r\\nOK\\r\\n", 6) == 0)
+    if(strstr((char*)rx_buffer_SIM808, "OK") != NULL)
     {
       return True;
     }
   }
 
   return False;
-}
-
-HAL_StatusTypeDef get_s_SIM808(uint8_t* s, uint8_t size, uint8_t timeout)
-{
-  return HAL_UART_Receive(&huart1, (uint8_t *)s, size, timeout);
 }
 
 void put_c_SIM808(uint8_t c)
@@ -73,7 +72,7 @@ void reset_SIM808()
 
 void configure_SIM808()
 {
-  if(True == get_SIM808_status(30))
+  if(True == get_SIM808_status(200))
   {
     put_s_SIM808((uint8_t*)"ATE0\r");   // disable command echo mode
   }
@@ -81,9 +80,9 @@ void configure_SIM808()
 
 void SIM808_init()
 {
-  //HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);
-  GPS_ant_pwr(False);  // default value: GPS antenna pwr off
-  configure_SIM808();  // send default config if the module is powered
+  HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);
+  GPS_ant_pwr(False);  // default value: GPS antenna power off
+  configure_SIM808();  // send default configuration if the module is powered
 }
 
 
