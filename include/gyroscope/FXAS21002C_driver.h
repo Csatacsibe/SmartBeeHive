@@ -68,6 +68,17 @@ void w_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buf
 /*
  *  resets FXAS21002C by pulling its RST pin low
  */
-void reset_FXAS21002C(void);
+void reset_hard_FXAS21002C(void);
+
+/*
+ *  resets FXAS21002C by setting the RST bit
+ *  in the CTRL_REG1 register
+ */
+void reset_soft_FXAS21002C(void);
+
+/*
+ *  Initializes the RST pin
+ */
+void FXAS21002C_init(void);
 
 #endif /* FXAS21002C_DRIVER_H_ */

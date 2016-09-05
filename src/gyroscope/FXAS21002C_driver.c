@@ -37,9 +37,21 @@ void w_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buf
   HAL_I2C_Master_Transmit(&hi2c1, i2c_addr, cmd, reg_nbr + 1, 10000);
 }
 
-void reset_FXAS21002C()
+void reset_hard_FXAS21002C()
 {
   HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_RESET);
   HAL_Delay(150);
+  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
+}
+
+void reset_soft_FXAS21002C()
+{
+  uint8_t cmd = (1<<6);
+
+  w_regs_FXAS21002C(CTRL_REG1, 1, &cmd);
+}
+
+void FXAS21002C_init()
+{
   HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
 }
