@@ -17,6 +17,7 @@
 
 /* SBH peripherals*/
 #include "power_management.h"
+#include "device_management.h"
 #include <gyroscope/FXAS21002C_driver.h>
 #include <GPRS_GSM/SIM808_driver.h>
 #include <hum_temp_sensor/Si7021_driver.h>
@@ -26,22 +27,6 @@
 #include "math.h"
 
 void SystemClock_Config(void);
-
-static void debug_print_float(float value);
-
-static void debug_print_float(float value)
-{
-  char str[100];
-
-  int d1 = value;
-  float f2 = value - d1;
-  int d2 = trunc(f2 * 1000);
-
-  sprintf(str, "=%d.%03d", d1, d2);
-
-  //put_s_SIM808((uint8_t*)str);
-  HAL_Delay(5);
-}
 
 int main(void)
 {
@@ -63,9 +48,8 @@ int main(void)
   FXAS21002C_init();
 
   /* Local variables */
-  volatile float vdd, vbat, idd, temp_MCU;
-  float temp, humi;
-  uint8_t buffer[10];
+  //volatile float vdd, vbat, idd, temp_MCU;
+  //float temp, humi;
 
   while (1)
   {
@@ -75,9 +59,20 @@ int main(void)
     temp_MCU = r_MCU_temp();
 
     r_both_Si7021(&humi, &temp);*/
-    put_s_SIM808((uint8_t*)"AT\r");
-    HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 5);
-    HAL_Delay(100);
+
+    if(r_push_button())
+    {
+      toggle_switch_state();
+    }
+
+    if(get_switch_state())
+    {
+      ext_LED(1);
+    }
+    else
+    {
+      ext_LED(0);
+    }
   }
 }
 

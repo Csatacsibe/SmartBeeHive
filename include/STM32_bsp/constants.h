@@ -36,9 +36,9 @@
 #define GY_INT1_GPIO_Port     GPIOB
 #define GY_INT2_Pin           GPIO_PIN_5
 #define GY_INT2_GPIO_Port     GPIOB
-#define RSVD_Pin              GPIO_PIN_6
-#define RSVD_GPIO_Port        GPIOB
-#define RSVDB7_Pin            GPIO_PIN_7
-#define RSVDB7_GPIO_Port      GPIOB
+#define TACT_BUTTON           GPIO_PIN_6
+#define TACT_BUTTON_GPIO_Port GPIOB
+#define LED_Pin               GPIO_PIN_7
+#define LED_GPIO_Port         GPIOB
 
 #endif
