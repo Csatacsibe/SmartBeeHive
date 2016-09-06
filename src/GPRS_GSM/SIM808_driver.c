@@ -59,7 +59,7 @@ void GPS_ant_pwr(boolean_t val)
 void power_SIM808()
 {
   HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_RESET);
-  HAL_Delay(1500);
+  HAL_Delay(1100);
   HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_SET);
 }
 
@@ -80,7 +80,9 @@ void configure_SIM808()
 
 void SIM808_init()
 {
-  HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_SET); // Sets GPIO to High-Z, pulled up in the SIM808 internally
+  HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);         // Sets GPIO to High-Z, externally pulled up
+
   GPS_ant_pwr(False);  // default value: GPS antenna power off
   configure_SIM808();  // send default configuration if the module is powered
 }

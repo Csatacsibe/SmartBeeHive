@@ -37,10 +37,10 @@ int main(void)
   SystemClock_Config();
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
   MX_ADC_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
+  MX_GPIO_Init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
@@ -63,6 +63,7 @@ int main(void)
     if(r_push_button())
     {
       toggle_switch_state();
+      power_SIM808();
     }
 
     if(get_switch_state())

@@ -14,12 +14,12 @@ extern uint8_t rx_buffer_SIM808[160];
 extern boolean_t rx_cmplt;
 
 /*
- *  set default pin values
+ *  Sets the default state of the RST and PWRKEY pins.
  */
 void SIM808_init(void);
 
 /*
- *  power on/off GPS antenna
+ *  Power ON/OFF GPS antenna.
  *
  *  params:
  *  val: True  = power on
@@ -28,14 +28,12 @@ void SIM808_init(void);
 void GPS_ant_pwr(boolean_t val);
 
 /*
- *  Drives PWRKEY low for 2 second
- *  to turn ON/OFF the module.
+ *  Drives PWRKEY low for 1.1 second to turn ON/OFF the module.
  */
 void power_SIM808(void);
 
 /*
- *  Drives RST low for 150 miliseconds
- *  to reset the module.
+ *  Drives RST low for 150 miliseconds to reset the module.
  */
 void reset_SIM808(void);
 
@@ -50,8 +48,7 @@ void put_c_SIM808(uint8_t c);
 void put_s_SIM808(uint8_t* string);
 
 /*
- *  Sets command echo mode
- *  (...) and more.
+ *  Sends default configuration if the module is powered.
  */
 void configure_SIM808(void);
 
