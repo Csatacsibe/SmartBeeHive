@@ -19,7 +19,7 @@
 #include "power_management.h"
 #include "device_management.h"
 #include <gyroscope/FXAS21002C_driver.h>
-#include <GPRS_GSM/SIM808_driver.h>
+#include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <hum_temp_sensor/Si7021_driver.h>
 
 #include "eeprom.h"

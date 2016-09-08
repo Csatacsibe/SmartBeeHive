@@ -5,11 +5,11 @@
  *      Author: Bence
  */
 
-#include <GPRS_GSM/SIM808_driver.h>
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
 #include <STM32_bsp/usart.h>
 #include <device_management.h>
+#include <GPRS_GSM_GPS/SIM808_driver.h>
 
 #include "string.h"
 
