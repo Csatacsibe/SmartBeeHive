@@ -13,6 +13,9 @@
 /* List of possibly useful commands:
  *
  * AT+CANT Antenna Detecting
+ * AT+CMTE Set Critical Temperature Operating Mode or Query Temperature
+ * AT+SLEDS Set the Timer Period of Net Light
+ * AT+CSGS Netlight Indication of GPRS Status
  */
 
 /*
