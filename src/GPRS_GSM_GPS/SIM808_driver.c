@@ -26,10 +26,7 @@ static boolean_t get_SIM808_status(uint32_t to)
 
 boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to)
 {
-  put_s_SIM808(msg);
-  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, length);
-
-  if(waitFor(&rx_cmplt, to) == True)
+  if(send_n_wait_for_resp(msg, length, to))
   {
     if(strstr((char*)rx_buffer_SIM808, pattern) != NULL)
     {
@@ -38,6 +35,14 @@ boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to
   }
 
   return False;
+}
+
+boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint8_t to)
+{
+  put_s_SIM808(msg);
+  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, length);
+
+  return waitFor(&rx_cmplt, to);
 }
 
 void put_c_SIM808(char c)

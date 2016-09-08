@@ -68,4 +68,17 @@ void configure_SIM808(void);
  */
 boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to);
 
+/*
+ * Sends a message and waits until the response is received.
+ *
+ * @param msg: string to be sent
+ * @param length: expected response length
+ * @param to: timeout value
+ *
+ * @retval:
+ * False in case timeout
+ * True in case of rx complete
+ */
+boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint8_t to);
+
 #endif /* SIM808_DRIVER_H_ */

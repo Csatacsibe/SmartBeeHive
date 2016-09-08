@@ -15,3 +15,12 @@ void set_netlight(uint8_t value)
   put_s_SIM808(cmd);
 }
 
+uint8_t get_netlight()
+{
+  if(send_n_wait_for_resp("AT+CNETLIGHT?\r", 17, 200) == True)
+  {
+    // TODO: process response
+  }
+
+  return 255;
+}
