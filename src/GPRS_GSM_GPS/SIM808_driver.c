@@ -45,7 +45,7 @@ boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint8_t to)
   return waitFor(&rx_cmplt, to);
 }
 
-void put_c_SIM808(char c)
+void put_c_SIM808(uint8_t c)
 {
   HAL_UART_Transmit(&huart1, &c, 1, 0xFFFFFF);
 }
@@ -85,7 +85,7 @@ void configure_SIM808()
 {
   if(True == get_SIM808_status(200))
   {
-    put_s_SIM808((uint8_t*)"ATE0\r");   // disable command echo mode
+    put_s_SIM808("ATE0\r");   // disable command echo mode
   }
 }
 

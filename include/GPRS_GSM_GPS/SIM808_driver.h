@@ -41,7 +41,7 @@ void reset_SIM808(void);
 /*
  *  Sends a single byte to the module.
  */
-void put_c_SIM808(char c);
+void put_c_SIM808(uint8_t c);
 
 /*
  *  Sends a string to the module.
