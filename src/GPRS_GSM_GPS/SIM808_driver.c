@@ -15,6 +15,7 @@
 
 uint8_t rx_buffer_SIM808[160];
 boolean_t rx_cmplt = False;
+boolean_t check_in_isr = False;
 
 static boolean_t get_SIM808_status(uint32_t to);
 

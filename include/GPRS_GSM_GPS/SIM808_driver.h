@@ -12,6 +12,7 @@
 
 extern uint8_t rx_buffer_SIM808[160];
 extern boolean_t rx_cmplt;
+extern boolean_t check_in_isr;
 
 /*
  *  Sets the default state of the RST and PWRKEY pins.
