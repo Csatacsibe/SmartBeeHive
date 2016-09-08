@@ -21,8 +21,8 @@ void SIM808_init(void);
 /*
  *  Power ON/OFF GPS antenna.
  *
- *  params:
- *  val: True  = power on
+ *  @param val:
+ *       True  = power on
  *       False = power off
  */
 void GPS_ant_pwr(boolean_t val);
@@ -40,16 +40,31 @@ void reset_SIM808(void);
 /*
  *  Sends a single byte to the module.
  */
-void put_c_SIM808(uint8_t c);
+void put_c_SIM808(char c);
 
 /*
  *  Sends a string to the module.
  */
-void put_s_SIM808(uint8_t* string);
+void put_s_SIM808(char* string);
 
 /*
  *  Sends default configuration if the module is powered.
  */
 void configure_SIM808(void);
+
+/*
+ * Sends a message and check if response matches
+ * the pattern.
+ *
+ * @param msg: string to be sent
+ * @param pattern: text to be checked in the answer
+ * @param length: expected response length
+ * @param to: timeout value
+ *
+ * @retval:
+ * False in case of mismatch or timeout
+ * True in case of match
+ */
+boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to);
 
 #endif /* SIM808_DRIVER_H_ */

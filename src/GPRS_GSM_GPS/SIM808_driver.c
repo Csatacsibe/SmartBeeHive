@@ -20,12 +20,17 @@ static boolean_t get_SIM808_status(uint32_t to);
 
 static boolean_t get_SIM808_status(uint32_t to)
 {
-  put_s_SIM808((uint8_t*)"AT\r");
-  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 7);
+  return check_resp_SIM808("AT\r","OK", 7, to);
+}
 
-  if(waitFor(&rx_cmplt, to))
+boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to)
+{
+  put_s_SIM808(msg);
+  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, length);
+
+  if(waitFor(&rx_cmplt, to) == True)
   {
-    if(strstr((char*)rx_buffer_SIM808, "OK") != NULL)
+    if(strstr((char*)rx_buffer_SIM808, pattern) != NULL)
     {
       return True;
     }
@@ -34,14 +39,14 @@ static boolean_t get_SIM808_status(uint32_t to)
   return False;
 }
 
-void put_c_SIM808(uint8_t c)
+void put_c_SIM808(char c)
 {
   HAL_UART_Transmit(&huart1, &c, 1, 0xFFFFFF);
 }
 
-void put_s_SIM808(uint8_t* string)
+void put_s_SIM808(char* string)
 {
-  HAL_UART_Transmit(&huart1, string, strlen((char*)string), 0xFFFFFF);
+  HAL_UART_Transmit(&huart1, (uint8_t*)string, strlen((char*)string), 0xFFFFFF);
 }
 
 void GPS_ant_pwr(boolean_t val)
