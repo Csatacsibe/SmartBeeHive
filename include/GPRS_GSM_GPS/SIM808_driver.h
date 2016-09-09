@@ -66,7 +66,7 @@ void configure_SIM808(void);
  * False in case of mismatch or timeout
  * True in case of match
  */
-boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to);
+boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint32_t to);
 
 /*
  * Sends a message and waits until the response is received.
@@ -79,6 +79,6 @@ boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint8_t to
  * False in case timeout
  * True in case of rx complete
  */
-boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint8_t to);
+boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint32_t to);
 
 #endif /* SIM808_DRIVER_H_ */

@@ -59,8 +59,9 @@ int main(void)
     temp_MCU = r_MCU_temp();
 
     r_both_Si7021(&humi, &temp);*/
+    put_s_SIM808("AT\r");
 
-    if(r_push_button())
+    /*if(r_push_button())
     {
       toggle_switch_state();
       power_SIM808();
@@ -73,7 +74,7 @@ int main(void)
     else
     {
       ext_LED(0);
-    }
+    }*/
   }
 }
 
