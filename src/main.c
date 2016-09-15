@@ -14,6 +14,7 @@
 #include <STM32_bsp/gpio.h>
 #include <STM32_bsp/i2c.h>
 #include <STM32_bsp/usart.h>
+#include <STM32_bsp/rtc.h>
 
 /* SBH peripherals*/
 #include "power_management.h"
@@ -41,11 +42,17 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_GPIO_Init();
+  MX_RTC_Init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
   FXAS21002C_init();
+
+  //__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+  //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
+  //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
   /* Local variables */
   //volatile float vdd, vbat, idd, temp_MCU;
@@ -59,22 +66,32 @@ int main(void)
     temp_MCU = r_MCU_temp();
 
     r_both_Si7021(&humi, &temp);*/
-    put_s_SIM808("AT\r");
 
-    /*if(r_push_button())
+    if(r_push_button())
     {
       toggle_switch_state();
-      power_SIM808();
+
+      ext_LED(1);
+
+      //HAL_SuspendTick();
+
+      /* Request to enter SLEEP mode */
+      //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      //HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      //HAL_PWR_EnterSTANDBYMode();
+
+      /* Resume Tick interrupt if disabled prior to sleep mode entry*/
+      //HAL_ResumeTick();
     }
 
     if(get_switch_state())
     {
-      ext_LED(1);
+
     }
     else
     {
-      ext_LED(0);
-    }*/
+
+    }
   }
 }
 
@@ -87,11 +104,13 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSI14;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSI14
+                              |RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI14State = RCC_HSI14_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.HSI14CalibrationValue = 16;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
@@ -101,9 +120,11 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_RTC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
 
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
