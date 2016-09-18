@@ -10,6 +10,13 @@
 
 #include "types.h"
 
+typedef enum led_state
+{
+  OFF = 0,
+  ON  = 1,
+  TOGGLE = 2
+}led_state_t;
+
 /*
  *  Waits for a flag to be set
  *
@@ -22,10 +29,9 @@
 boolean_t waitFor(boolean_t* flag, uint32_t timeout);
 
 /*
- * SET, RESET, TOGGLE external LED
- *
+ * ON, OFF, TOGGLE external LED
  */
-void ext_LED(uint8_t state);
+void ext_LED(led_state_t state);
 
 /*
  * Read external button state

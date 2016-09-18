@@ -34,7 +34,7 @@ boolean_t waitFor(boolean_t* flag, uint32_t timeout)
   return True;
 }
 
-void ext_LED(uint8_t state)
+void ext_LED(led_state_t state)
 {
   if(state == 0)
   {
