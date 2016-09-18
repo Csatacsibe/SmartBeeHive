@@ -56,7 +56,7 @@ int main(void)
 
   /* Local variables */
   volatile float vdd, vbat, idd, temp_MCU;
-  volatile GPIO_PinState state;
+  volatile boolean_t state;
   //float temp, humi;
 
   while (1)

@@ -35,10 +35,10 @@ void batt_charger_set(boolean_t val);
 /*
  *  returns status of MCP73832 LiPo charger
  *
- *  return: GPIO_PIN_SET:   Shutdown, No Battery Present, Charger Complete - Standby
- *          GPIO_PIN_RESET: Preconditioning, Constant-Current Fast Charge, Constant Voltage
+ *  return: True:   Shutdown, No Battery Present, Charger Complete - Standby
+ *          False: Preconditioning, Constant-Current Fast Charge, Constant Voltage
  */
-GPIO_PinState get_charger_stat(void);
+boolean_t get_charger_stat(void);
 
 /*
  *  set default pin values

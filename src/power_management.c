@@ -30,9 +30,17 @@ void batt_charger_set(boolean_t val)
   }
 }
 
-GPIO_PinState get_charger_stat()
+boolean_t get_charger_stat()
 {
-  return HAL_GPIO_ReadPin(CHG_STAT_GPIO_Port, CHG_STAT_Pin);
+  if(GPIO_PIN_SET == HAL_GPIO_ReadPin(CHG_STAT_GPIO_Port, CHG_STAT_Pin))
+  {
+    return True;
+  }
+  else
+  {
+    return False;
+  }
+
 }
 
 void power_mngt_init()
