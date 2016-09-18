@@ -113,8 +113,7 @@ void enter_mode(power_saving_mode_t mode)
       break;
     case STOP: HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
       break;
-    case STANDBY:
-      HAL_PWR_EnterSTANDBYMode();
+    case STANDBY: HAL_PWR_EnterSTANDBYMode();
       break;
   }
 
