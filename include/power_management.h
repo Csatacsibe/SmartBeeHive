@@ -14,6 +14,13 @@
 
 #include "types.h"
 
+typedef enum power_saving_mode
+{
+  SLEEP  = 1,
+  STOP = 2,
+  STANDBY = 3
+}power_saving_mode_t;
+
 /*
  *  enable/disable ADP1613 DCDC converter
  *
@@ -67,5 +74,10 @@ float r_supply_current(void);
  * Returns the temperature in °C.
  */
 float r_MCU_temp(void);
+
+/*
+ * The MCU enters the power saving mode selected by @param mode.
+ */
+void enter_mode(power_saving_mode_t mode);
 
 #endif /* POWER_MANAGEMENT_H_ */

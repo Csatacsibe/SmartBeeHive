@@ -49,7 +49,7 @@ int main(void)
   SIM808_init();
   FXAS21002C_init();
 
-  //__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
@@ -72,19 +72,11 @@ int main(void)
     if(r_push_button())
     {
       toggle_switch_state();
-
-      ext_LED(1);
-
-      //HAL_SuspendTick();
-
-      /* Request to enter SLEEP mode */
-      //HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-      //HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-      //HAL_PWR_EnterSTANDBYMode();
-
-      /* Resume Tick interrupt if disabled prior to sleep mode entry*/
-      //HAL_ResumeTick();
+      enter_mode(STANDBY);
     }
+
+    HAL_Delay(250);
+    ext_LED(TOGGLE);
 
     if(get_switch_state())
     {

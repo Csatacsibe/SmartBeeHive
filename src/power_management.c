@@ -2,6 +2,7 @@
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
 #include "power_management.h"
+#include <GPRS_GSM_GPS/SIM808_driver.h>
 
 static float I_SENSE_GAIN = 725.6;   // I_supply [mA] = V_sense[V] * I_SENSE_GAIN[mA/V]
 static float FACTORY_CALIB_VDD = 3.31;
@@ -97,4 +98,25 @@ float r_MCU_temp()
   temp = slope * (temp - (*TEMP30_CAL_ADDR)) + 30;
 
   return temp;
+}
+
+void enter_mode(power_saving_mode_t mode)
+{
+  _4V2_converter_set(False);
+  GPS_ant_pwr(False);
+
+  HAL_SuspendTick();
+
+  switch(mode)
+  {
+    case SLEEP: HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      break;
+    case STOP: HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      break;
+    case STANDBY:
+      HAL_PWR_EnterSTANDBYMode();
+      break;
+  }
+
+  HAL_ResumeTick();
 }
