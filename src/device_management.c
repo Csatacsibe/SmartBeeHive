@@ -7,7 +7,15 @@
 
 #include "device_management.h"
 
-static boolean_t switch_state = False;
+
+static volatile boolean_t switch_state = False;
+static volatile uint32_t rtc_min_val = 0;
+
+/*
+ * Local variables without getter
+ */
+static volatile uint32_t prev_tick = 0;
+static volatile uint32_t rtc_min_cntr = 0;
 
 boolean_t waitFor(boolean_t* flag, uint32_t timeout)
 {
@@ -80,7 +88,6 @@ boolean_t get_switch_state()
   return switch_state;
 }
 
-
 void toggle_switch_state()
 {
   switch(switch_state)
@@ -93,3 +100,25 @@ void toggle_switch_state()
       break;
   }
 }
+
+void measure_RTC_1min()
+{
+  if(rtc_min_cntr < 10)
+  {
+    uint32_t tick_now = HAL_GetTick();
+    rtc_min_val += (tick_now - prev_tick);
+    prev_tick = tick_now;
+    rtc_min_cntr++;
+
+    if(rtc_min_cntr == 10)
+    {
+       rtc_min_val = rtc_min_val/10;
+    }
+  }
+}
+
+uint32_t get_rtc_min_val()
+{
+  return rtc_min_val;
+}
+

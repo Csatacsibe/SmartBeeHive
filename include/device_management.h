@@ -44,4 +44,15 @@ boolean_t get_switch_state(void);
  */
 void toggle_switch_state(void);
 
+/*
+ * Measures an average 1 minute of the RTC using SysTick
+ * retval is available in rtc_min_val
+ */
+void measure_RTC_1min(void);
+
+/*
+ * Returns the value of rtc_min_val variable
+ */
+uint32_t get_rtc_min_val(void);
+
 #endif /* DEVICE_MANAGEMENT_H_ */

@@ -15,10 +15,6 @@ extern ADC_HandleTypeDef hadc;
 extern UART_HandleTypeDef huart1;
 extern RTC_HandleTypeDef hrtc;
 
-volatile uint32_t prev_tick = 0;
-volatile uint32_t diffs[10];
-volatile uint32_t i = 0;
-
 /******************************************************************************/
 /*            Cortex-M0 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
@@ -63,14 +59,6 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
   if(hrtc->Instance == RTC)
   {
-    volatile uint32_t tickstart = HAL_GetTick();
-    diffs[i] = tickstart - prev_tick;
-    prev_tick = tickstart;
-    i++;
-
-    if(i == 10)
-    {
-
-    }
+    measure_RTC_1min();
   }
 }
