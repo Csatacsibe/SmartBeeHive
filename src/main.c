@@ -55,17 +55,19 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
   /* Local variables */
-  //volatile float vdd, vbat, idd, temp_MCU;
+  volatile float vdd, vbat, idd, temp_MCU;
+  volatile GPIO_PinState state;
   //float temp, humi;
 
   while (1)
   {
-    /*vdd  = calculate_MCU_Vdd();
+    vdd  = calculate_MCU_Vdd();
     vbat = r_battery_voltage();
     idd  = r_supply_current();
     temp_MCU = r_MCU_temp();
+    state = get_charger_stat();
 
-    r_both_Si7021(&humi, &temp);*/
+    //r_both_Si7021(&humi, &temp);
 
     if(r_push_button())
     {
