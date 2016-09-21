@@ -37,7 +37,7 @@ void _4V2_converter_set(boolean_t val);
  *  val: True  = enable
  *       False = disable
  */
-void batt_charger_set(boolean_t val);
+void enable_bat_charger(boolean_t val);
 
 /*
  *  returns status of MCP73832 LiPo charger

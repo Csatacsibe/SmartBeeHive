@@ -19,7 +19,7 @@ void _4V2_converter_set(boolean_t val)
   }
 }
 
-void batt_charger_set(boolean_t val)
+void enable_bat_charger(boolean_t val)
 {
   if(val == True)
   {
@@ -47,7 +47,7 @@ boolean_t get_charger_stat()
 void power_mngt_init()
 {
   _4V2_converter_set(True); // default value: 4V2 rail enabled
-  batt_charger_set(False);  // default value: LiPo charger disabled
+  enable_bat_charger(False);  // default value: LiPo charger disabled
 }
 
 float calculate_MCU_Vdd()
