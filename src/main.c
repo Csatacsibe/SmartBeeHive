@@ -19,13 +19,12 @@
 /* SBH peripherals*/
 #include "power_management.h"
 #include "device_management.h"
+#include <weight_measurement.h>
 #include <gyroscope/FXAS21002C_driver.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <hum_temp_sensor/Si7021_driver.h>
 
 #include "eeprom.h"
-
-#include "math.h"
 
 void SystemClock_Config(void);
 
@@ -55,7 +54,7 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
   /* Local variables */
-  volatile float vdd, vbat, idd, temp_MCU;
+  volatile float vdd, vbat, idd, temp_MCU, strain_gauge;
   volatile boolean_t state;
   //float temp, humi;
 
@@ -66,17 +65,14 @@ int main(void)
     idd  = r_supply_current();
     temp_MCU = r_MCU_temp();
     state = get_charger_stat();
+    strain_gauge = r_wheatstone_bridge();
 
     //r_both_Si7021(&humi, &temp);
 
     if(r_push_button())
     {
       toggle_switch_state();
-      enter_mode(STANDBY);
     }
-
-    HAL_Delay(250);
-    ext_LED(TOGGLE);
 
     if(get_switch_state())
     {
