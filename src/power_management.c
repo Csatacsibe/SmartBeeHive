@@ -4,7 +4,7 @@
 #include "power_management.h"
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
-static float I_SENSE_GAIN = 725.6;   // I_supply [mA] = V_sense[V] * I_SENSE_GAIN[mA/V]
+static float I_SENSE_GAIN = 0.7256;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
 static float FACTORY_CALIB_VDD = 3.31;
 
 void _4V2_converter_set(boolean_t val)
@@ -50,37 +50,37 @@ void power_mngt_init()
   enable_bat_charger(False);  // default value: LiPo charger disabled
 }
 
-float calculate_MCU_Vdd()
+uint16_t calculate_MCU_Vdd()
 {
   float analog_Vdd;
   uint16_t val_Vref_int = r_single_int_channel_ADC(ADC_CHANNEL_VREFINT);
 
   analog_Vdd = (FACTORY_CALIB_VDD * (*VREFINT_CAL_ADDR))/val_Vref_int;
 
-  return analog_Vdd;
+  return analog_Vdd * 1000;
 }
 
-float r_battery_voltage()
+uint16_t r_battery_voltage()
 {
   float vbat;
-  float mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_Vdd();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(BATTERY_VOLTAGE);
-  vbat = (mcu_vdd/4095) * digital_val;
+  vbat = (mcu_vdd/4095.0) * digital_val;
   vbat = vbat * 2;         // 1/2 voltage divider
 
   return vbat;
 }
 
-float r_supply_current()
+uint16_t r_supply_current()
 {
   float v_sense, current;
-  float mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_Vdd();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(SUPPLY_CURRENT);
-  v_sense = (mcu_vdd/4095) * digital_val;
+  v_sense = (mcu_vdd/4095.0) * digital_val;
   current = v_sense * I_SENSE_GAIN;
 
   return current;
@@ -89,12 +89,12 @@ float r_supply_current()
 float r_MCU_temp()
 {
   float temp;
-  float mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_Vdd();
   float slope = (110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR));
 
   uint16_t ts_data = r_single_int_channel_ADC(ADC_CHANNEL_TEMPSENSOR);
 
-  temp = (mcu_vdd/FACTORY_CALIB_VDD) * ts_data;
+  temp = ((mcu_vdd/FACTORY_CALIB_VDD) * ts_data)/1000;
   temp = slope * (temp - (*TEMP30_CAL_ADDR)) + 30;
 
   return temp;

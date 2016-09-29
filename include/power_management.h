@@ -55,19 +55,19 @@ void power_mngt_init(void);
 /*
  * Reads the internal voltage reference,
  * the internal reference voltage calibration
- * value and calculates the supply voltage in Volts.
+ * value and calculates the supply voltage in milivolts.
  */
-float calculate_MCU_Vdd(void);
+uint16_t calculate_MCU_Vdd(void);
 
 /*
- * Returns the battery voltage in Volts.
+ * Returns the battery voltage in milivolts.
  */
-float r_battery_voltage(void);
+uint16_t r_battery_voltage(void);
 
 /*
  * Returns the board supply current in mA.
  */
-float r_supply_current(void);
+uint16_t r_supply_current(void);
 
 /*
  * Reads the MCU internal temperature sensor.

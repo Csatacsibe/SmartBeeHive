@@ -117,7 +117,7 @@ void measure_RTC_1min()
   }
 }
 
-uint32_t get_rtc_min_val()
+uint32_t get_RTC_min_val()
 {
   return rtc_min_val;
 }

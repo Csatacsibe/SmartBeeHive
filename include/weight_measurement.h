@@ -11,8 +11,8 @@
 #include "types.h"
 
 /*
- *  Return the output votlage of the strain gauge Wheatstone bridge in volts.
+ *  Return the output votlage of the strain gauge Wheatstone bridge in milivolts.
  */
-float r_wheatstone_bridge(void);
+uint16_t r_wheatstone_bridge(void);
 
 #endif /* WEIGHT_MEASUREMENT_H_ */

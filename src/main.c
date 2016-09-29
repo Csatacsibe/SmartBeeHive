@@ -54,7 +54,8 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
   /* Local variables */
-  volatile float vdd, vbat, idd, temp_MCU, strain_gauge;
+  volatile uint16_t vdd, vbat, idd, strain_gauge;
+  volatile float temp_MCU;
   volatile boolean_t state;
   //float temp, humi;
 
@@ -64,15 +65,19 @@ int main(void)
     vbat = r_battery_voltage();
     idd  = r_supply_current();
     temp_MCU = r_MCU_temp();
-    state = get_charger_stat();
     strain_gauge = r_wheatstone_bridge();
+
+    state = get_charger_stat();
 
     //r_both_Si7021(&humi, &temp);
 
     if(r_push_button())
     {
       toggle_switch_state();
+      power_SIM808();
     }
+
+    //send_n_wait_for_resp("AT\r", 3, 200);
 
     if(get_switch_state())
     {

@@ -59,6 +59,6 @@ void measure_RTC_1min(void);
 /*
  * Returns the value of rtc_min_val variable
  */
-uint32_t get_rtc_min_val(void);
+uint32_t get_RTC_min_val(void);
 
 #endif /* DEVICE_MANAGEMENT_H_ */
