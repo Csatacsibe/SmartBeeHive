@@ -85,8 +85,8 @@ void configure_SIM808()
 {
   if(True == get_SIM808_status(200))
   {
-    //put_s_SIM808("ATE0\r");   // disable command echo mode
-    //put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
+    put_s_SIM808("ATE0\r");   // disable command echo mode
+    put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
   }
 }
 
