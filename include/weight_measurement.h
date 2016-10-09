@@ -15,4 +15,8 @@
  */
 uint16_t r_wheatstone_bridge(void);
 
+uint16_t process_bridge_output(uint16_t value);
+
+void calibrate_scale(void);
+
 #endif /* WEIGHT_MEASUREMENT_H_ */

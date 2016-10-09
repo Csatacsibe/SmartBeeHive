@@ -43,6 +43,8 @@ int main(void)
   MX_GPIO_Init();
   MX_RTC_Init();
 
+  calibrate_scale();
+
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
@@ -58,6 +60,8 @@ int main(void)
   volatile float temp_MCU;
   volatile boolean_t state;
   //float temp, humi;
+  volatile uint16_t index = 0;
+  volatile uint16_t measurement[1000];
 
   while (1)
   {
@@ -65,7 +69,21 @@ int main(void)
     vbat = r_battery_voltage();
     idd  = r_supply_current();
     temp_MCU = r_MCU_temp();
-    strain_gauge = r_wheatstone_bridge();
+    strain_gauge = process_bridge_output(r_wheatstone_bridge());
+
+    if(index < 1000)
+    {
+      measurement[index++] = strain_gauge;
+      if(index%250 == 0)
+      {
+        ext_LED(ON);
+      }
+    }
+    else
+    {
+      ext_LED(OFF);
+      index = 0;
+    }
 
     state = get_charger_stat();
 
@@ -74,7 +92,6 @@ int main(void)
     if(r_push_button())
     {
       toggle_switch_state();
-      power_SIM808();
     }
 
     //send_n_wait_for_resp("AT\r", 3, 200);
