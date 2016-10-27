@@ -17,6 +17,16 @@ uint16_t r_wheatstone_bridge(void);
 
 uint16_t process_bridge_output(uint16_t value);
 
-void calibrate_scale(void);
+/*
+ * Set the null point and initialize the averaging filter's buffer
+ */
+void scale_init();
+
+float averaging_filter(uint16_t input);
+
+/*
+ * Returns the mass in g, input is a processed value in mV
+ */
+uint32_t mass_in_g(float input);
 
 #endif /* WEIGHT_MEASUREMENT_H_ */
