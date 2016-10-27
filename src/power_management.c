@@ -31,7 +31,7 @@ void enable_bat_charger(boolean_t val)
   }
 }
 
-boolean_t get_charger_stat()
+boolean_t r_charger_stat()
 {
   if(GPIO_PIN_SET == HAL_GPIO_ReadPin(CHG_STAT_GPIO_Port, CHG_STAT_Pin))
   {
@@ -50,7 +50,7 @@ void power_mngt_init()
   enable_bat_charger(False);  // default value: LiPo charger disabled
 }
 
-uint16_t calculate_MCU_Vdd()
+uint16_t calculate_MCU_vcc()
 {
   float analog_Vdd;
   uint16_t val_Vref_int = r_single_int_channel_ADC(ADC_CHANNEL_VREFINT);
@@ -63,7 +63,7 @@ uint16_t calculate_MCU_Vdd()
 uint16_t r_battery_voltage()
 {
   float vbat;
-  uint16_t mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_vcc();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(BATTERY_VOLTAGE);
@@ -76,7 +76,7 @@ uint16_t r_battery_voltage()
 uint16_t r_supply_current()
 {
   float v_sense, current;
-  uint16_t mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_vcc();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(SUPPLY_CURRENT);
@@ -89,7 +89,7 @@ uint16_t r_supply_current()
 float r_MCU_temp()
 {
   float temp;
-  uint16_t mcu_vdd = calculate_MCU_Vdd();
+  uint16_t mcu_vdd = calculate_MCU_vcc();
   float slope = (110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR));
 
   uint16_t ts_data = r_single_int_channel_ADC(ADC_CHANNEL_TEMPSENSOR);

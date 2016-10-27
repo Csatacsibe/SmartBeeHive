@@ -45,7 +45,7 @@ void enable_bat_charger(boolean_t val);
  *  return: True:   Shutdown, No Battery Present, Charger Complete - Standby
  *          False: Preconditioning, Constant-Current Fast Charge, Constant Voltage
  */
-boolean_t get_charger_stat(void);
+boolean_t r_charger_stat(void);
 
 /*
  *  set default pin values
@@ -57,7 +57,7 @@ void power_mngt_init(void);
  * the internal reference voltage calibration
  * value and calculates the supply voltage in milivolts.
  */
-uint16_t calculate_MCU_Vdd(void);
+uint16_t calculate_MCU_vcc(void);
 
 /*
  * Returns the battery voltage in milivolts.
