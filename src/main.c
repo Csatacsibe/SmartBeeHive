@@ -28,6 +28,12 @@
 
 void SystemClock_Config(void);
 
+volatile uint16_t scale_raw;
+volatile float scale_averaged;
+
+device_t device;
+hive_data_t hive;
+
 int main(void)
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -43,7 +49,7 @@ int main(void)
   MX_GPIO_Init();
   MX_RTC_Init();
 
-  calibrate_scale();
+  scale_init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
@@ -55,46 +61,29 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
-  /* Local variables */
-  volatile uint16_t vdd, vbat, idd, strain_gauge;
-  volatile float temp_MCU;
-  volatile boolean_t state;
-  //float temp, humi;
-  volatile uint16_t index = 0;
-  volatile uint16_t measurement[1000];
+  hive.mass = 0;
 
   while (1)
   {
-    vdd  = calculate_MCU_Vdd();
-    vbat = r_battery_voltage();
-    idd  = r_supply_current();
-    temp_MCU = r_MCU_temp();
-    strain_gauge = process_bridge_output(r_wheatstone_bridge());
+    device.MCU_vcc         = calculate_MCU_vcc();
+    device.vbat            = r_battery_voltage();
+    device.current         = r_supply_current();
+    device.MCU_temperature = r_MCU_temp();
+    device.charger_status  = r_charger_stat();
 
-    if(index < 1000)
-    {
-      measurement[index++] = strain_gauge;
-      if(index%250 == 0)
-      {
-        ext_LED(ON);
-      }
-    }
-    else
-    {
-      ext_LED(OFF);
-      index = 0;
-    }
+    scale_raw = process_bridge_output(r_wheatstone_bridge());
+    scale_averaged = averaging_filter(scale_raw);
 
-    state = get_charger_stat();
+    ext_LED(TOGGLE);
 
-    //r_both_Si7021(&humi, &temp);
+    hive.mass = mass_in_g(scale_averaged);
+
+    //r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
     if(r_push_button())
     {
       toggle_switch_state();
     }
-
-    //send_n_wait_for_resp("AT\r", 3, 200);
 
     if(get_switch_state())
     {

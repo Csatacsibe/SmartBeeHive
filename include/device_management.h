@@ -17,6 +17,26 @@ typedef enum led_state
   TOGGLE = 2
 }led_state_t;
 
+typedef struct hive_data
+{
+  float    humidity;
+  float    temperature;
+  uint32_t mass;
+}hive_data_t;
+
+typedef struct device
+{
+  uint16_t vbat;
+  uint16_t current;
+  uint16_t MCU_vcc;
+
+  float MCU_temperature;
+  float GYRO_temperature;
+  float SIM808_temperature;
+
+  boolean_t charger_status;
+}device_t;
+
 /*
  *  Waits for a flag to be set
  *
