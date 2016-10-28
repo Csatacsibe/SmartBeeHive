@@ -17,12 +17,12 @@ void MX_RTC_Init(void)
   RTC_DateTypeDef sDate;
   RTC_AlarmTypeDef sAlarm;
 
-    /**Initialize RTC and set the Time and Date 
-    */
+  /**Initialize RTC and set the Time and Date
+  */
   hrtc.Instance = RTC;
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-  hrtc.Init.AsynchPrediv = 127;
-  hrtc.Init.SynchPrediv = 322;
+  hrtc.Init.AsynchPrediv = 42;
+  hrtc.Init.SynchPrediv = 958;
   hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
   hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
   hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
@@ -44,8 +44,8 @@ void MX_RTC_Init(void)
 
   HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BCD);
 
-    /**Enable the Alarm A 
-    */
+  /**Enable the Alarm A
+  */
   sAlarm.AlarmTime.Hours = 11;
   sAlarm.AlarmTime.Minutes = 0;
   sAlarm.AlarmTime.Seconds = 0;
