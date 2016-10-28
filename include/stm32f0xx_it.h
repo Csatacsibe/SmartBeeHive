@@ -13,9 +13,12 @@
 #endif 
 
 void SysTick_Handler(void);
+void RTC_IRQHandler(void);
+void EXTI0_1_IRQHandler(void);
+void EXTI4_15_IRQHandler(void);
+void DMA1_Channel1_IRQHandler(void);
 void ADC1_IRQHandler(void);
 void USART1_IRQHandler(void);
-void RTC_Alarm_IRQHandler(void);
 
 #ifdef __cplusplus
 }
