@@ -18,17 +18,30 @@ boolean_t rx_cmplt = False;
 boolean_t check_in_isr = False;
 
 static boolean_t get_SIM808_status(uint32_t to);
+static uint16_t length(char* message);
 
 static boolean_t get_SIM808_status(uint32_t to)
 {
   return check_resp_SIM808("AT\r","OK", 7, to);
 }
 
+uint16_t length(char* message)
+{
+  uint16_t i;
+
+  for(i = 0; message[i] != 0; i++)
+  {
+
+  }
+
+  return i;
+}
+
 boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint32_t to)
 {
   if(send_n_wait_for_resp(msg, length, to))
   {
-    if(strstr((char*)rx_buffer_SIM808, pattern) != NULL)
+    if(strstr((char*)rx_buffer_SIM808, pattern) != NULL) // TODO: Null terminate buffer first
     {
       return True;
     }
@@ -52,7 +65,7 @@ void put_c_SIM808(uint8_t c)
 
 void put_s_SIM808(char* string)
 {
-  HAL_UART_Transmit(&huart1, (uint8_t*)string, strlen(string), 0xFFFFFF);
+  HAL_UART_Transmit(&huart1, (uint8_t*)string, length(string), 0xFFFFFF);
 }
 
 void GPS_ant_pwr(boolean_t val)
@@ -85,7 +98,7 @@ void configure_SIM808()
 {
   if(True == get_SIM808_status(200))
   {
-    put_s_SIM808("ATE0\r");   // disable command echo mode
+    put_s_SIM808("ATE0\r");      // disable command echo mode
     put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
   }
 }
