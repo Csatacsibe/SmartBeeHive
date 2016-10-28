@@ -43,18 +43,18 @@ int main(void)
   SystemClock_Config();
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  //MX_DMA_Init();
   MX_ADC_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
-  MX_GPIO_Init();
   MX_RTC_Init();
-
-  scale_init();
 
   /* Initialize SBH peripherals */
   power_mngt_init();
   SIM808_init();
   FXAS21002C_init();
+  scale_init();
 
   __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 

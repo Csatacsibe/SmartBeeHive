@@ -7,8 +7,10 @@
 
 #include <STM32_bsp/adc.h>
 #include <STM32_bsp/gpio.h>
+#include <STM32_bsp/dma.h>
 
 ADC_HandleTypeDef hadc;
+DMA_HandleTypeDef hdma_adc;
 
 void MX_ADC_Init(void)
 {
@@ -64,6 +66,19 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* Peripheral DMA init*/
+    hdma_adc.Instance = DMA1_Channel1;
+    hdma_adc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_adc.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_adc.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_adc.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_adc.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_adc.Init.Mode = DMA_NORMAL;
+    hdma_adc.Init.Priority = DMA_PRIORITY_MEDIUM;
+    HAL_DMA_Init(&hdma_adc);
+
+    __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc);
+
     HAL_NVIC_SetPriority(ADC1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(ADC1_IRQn);
   }
@@ -81,6 +96,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     PA6     ------> ADC_IN6 
     */
     HAL_GPIO_DeInit(GPIOA, GAUGE_OUT_Pin|I_SUPP_Pin|V_BAT_Pin);
+
+    /* Peripheral DMA DeInit*/
+    HAL_DMA_DeInit(hadc->DMA_Handle);
 
     HAL_NVIC_DisableIRQ(ADC1_IRQn);
   }
