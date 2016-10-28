@@ -28,7 +28,7 @@
 
 void SystemClock_Config(void);
 
-volatile uint16_t scale_raw;
+volatile uint16_t scale_raw, user_input;
 volatile float scale_averaged;
 
 device_t device;
@@ -61,8 +61,6 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
-  hive.mass = 0;
-
   while (1)
   {
     device.MCU_vcc         = calculate_MCU_vcc();
@@ -73,8 +71,6 @@ int main(void)
 
     scale_raw = process_bridge_output(r_wheatstone_bridge());
     scale_averaged = averaging_filter(scale_raw);
-
-    ext_LED(TOGGLE);
 
     hive.mass = mass_in_g(scale_averaged);
 
@@ -92,6 +88,80 @@ int main(void)
     else
     {
 
+    }
+
+    switch(user_input)
+    {
+      case 1:
+        ext_LED(TOGGLE);
+        break;
+      case 2:
+      {
+        char* hello = "AT\r";
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      case 3:
+        power_SIM808();
+        user_input = 65535;
+
+        break;
+      case 4:
+      {
+        char* hello = "ATE0\r";
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      case 5:
+      {
+        char* hello = "AT+CMTE?\r"; // get temperature
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      case 6:
+      {
+        char* hello = "AT+CANT?\r"; // antenna detection
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      case 6:
+      {
+        char* hello = "AT+CCLK?\r"; // clock
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      case 7:
+      {
+        char* hello = "AT+CLTS?\r"; // get local timestamp
+
+        put_s_SIM808(hello);
+        user_input = 65535;
+
+        ext_LED(TOGGLE);
+        break;
+      }
+      default:
+        break;
     }
   }
 }
