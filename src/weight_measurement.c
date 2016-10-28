@@ -11,7 +11,7 @@
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
 
-#define WINDOW_SIZE 48
+#define WINDOW_SIZE 96
 
 static float scale_slope = 2.6; // 2.6 mV / 100 g
 
