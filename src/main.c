@@ -27,6 +27,7 @@
 #include "eeprom.h"
 
 void SystemClock_Config(void);
+void static reset_debug_input(void);
 
 volatile uint16_t scale_raw, user_input;
 volatile float scale_averaged;
@@ -96,68 +97,61 @@ int main(void)
         ext_LED(TOGGLE);
         break;
       case 2:
+        power_SIM808();
+        reset_debug_input();
+        break;
+      case 3:
       {
-        char* hello = "AT\r";
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
+        put_s_SIM808("AT\r");
+        reset_debug_input();
         break;
       }
-      case 3:
-        power_SIM808();
-        user_input = 65535;
-
-        break;
       case 4:
       {
-        char* hello = "ATE0\r";
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
+        put_s_SIM808("ATE0\r");     // disable echo mode
+        reset_debug_input();
         break;
       }
       case 5:
       {
-        char* hello = "AT+CMTE?\r"; // get temperature
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
+        put_s_SIM808("AT+CMTE?\r"); // get temperature
+        reset_debug_input();
         break;
       }
       case 6:
       {
-        char* hello = "AT+CANT?\r"; // antenna detection
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
-        break;
-      }
-      case 6:
-      {
-        char* hello = "AT+CCLK?\r"; // clock
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
+        put_s_SIM808("AT+CANT?\r"); // antenna detection
+        reset_debug_input();
         break;
       }
       case 7:
       {
-        char* hello = "AT+CLTS?\r"; // get local timestamp
-
-        put_s_SIM808(hello);
-        user_input = 65535;
-
-        ext_LED(TOGGLE);
+        put_s_SIM808("AT+CCLK?\r"); // get clock
+        reset_debug_input();
+        break;
+      }
+      case 8:
+      {
+        put_s_SIM808("AT+CLTS?\r"); // get local timestamp
+        reset_debug_input();
+        break;
+      }
+      case 9:
+      {
+        put_s_SIM808("AT+CSCLK?\r"); // get sleep configuration
+        reset_debug_input();
+        break;
+      }
+      case 10:
+      {
+        put_s_SIM808("ATI\r"); // Display the product name and the product release information.
+        reset_debug_input();
+        break;
+      }
+      case 11:
+      {
+        put_s_SIM808("AT+CBC=?\r"); // battery info, supply voltage reading
+        reset_debug_input();  
         break;
       }
       default:
@@ -204,6 +198,12 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+void static reset_debug_input()
+{
+    user_input = 65535;
+    ext_LED(TOGGLE);
 }
 
 #ifdef USE_FULL_ASSERT
