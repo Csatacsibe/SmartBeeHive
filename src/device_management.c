@@ -52,30 +52,23 @@ void ext_LED(led_state_t state)
 
 boolean_t r_push_button()
 {
-  uint8_t debounce[8];
+  uint32_t pushed = 0, not_pushed = 0;
 
-  uint8_t i, check = 0;
+  uint32_t i;
 
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 10000; i++)
   {
     if (HAL_GPIO_ReadPin(TACT_BUTTON_GPIO_Port, TACT_BUTTON))
     {
-      debounce[i] = 1;
+      pushed++;
     }
     else
     {
-      debounce[i] = 0;
+      not_pushed++;
     }
-
-    if (debounce[i] == 1)
-    {
-      check++;
-    }
-
-    HAL_Delay(20);
   }
 
-  if (check == 8)
+  if (pushed > 8000)
   {
     return True;
   }
