@@ -39,7 +39,7 @@ void GPS_ant_pwr(boolean_t val);
 void power_SIM808(void);
 
 /*
- *  Drives RST low for 150 miliseconds to reset the module.
+ *  Drives RST low for 150 milliseconds to reset the module.
  */
 void reset_SIM808(void);
 
@@ -47,6 +47,11 @@ void reset_SIM808(void);
  *  Sends a single byte to the module.
  */
 void put_c_SIM808(uint8_t c);
+
+/*
+ * Receives one character in blocking mode.
+ */
+uint8_t get_c_SIM808(void);
 
 /*
  *  Sends a string to the module, returns sent byte number.

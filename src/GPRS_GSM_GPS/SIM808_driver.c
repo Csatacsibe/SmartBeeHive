@@ -16,13 +16,6 @@ boolean_t rx_cmplt = False, rx_error = False;
 uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
 callback_t *rx_callback = NULL;
 
-static boolean_t get_SIM808_status(uint32_t to);
-
-static boolean_t get_SIM808_status(uint32_t to)
-{
-  return True;
-}
-
 uint16_t length(char* message)
 {
   uint16_t i;
@@ -38,6 +31,13 @@ uint16_t length(char* message)
 void put_c_SIM808(uint8_t c)
 {
   HAL_UART_Transmit(&huart1, &c, 1, 0xFFFFFF);
+}
+
+uint8_t get_c_SIM808()
+{
+  uint8_t retval = 0;
+  HAL_UART_Receive(&huart1, &retval, 1, 100);
+  return retval;
 }
 
 uint16_t put_s_SIM808(char* string)
@@ -83,11 +83,8 @@ void reset_SIM808()
 
 void configure_SIM808()
 {
-  if(True == get_SIM808_status(200))
-  {
-    put_s_SIM808("ATE0\r");      // disable command echo mode
-    put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
-  }
+  put_s_SIM808("ATE0\r");      // disable command echo mode
+  put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
 }
 
 void SIM808_init()

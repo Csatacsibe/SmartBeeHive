@@ -62,6 +62,9 @@ int main(void)
 
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
+  /*power_SIM808();
+  HAL_Delay(50);
+  put_s_SIM808("ATE0\r");*/     // disable echo mode
 
   while (1)
   {
@@ -77,15 +80,12 @@ int main(void)
     scale_averaged = averaging_filter(scale_raw);
 
     hive.mass = mass_in_g(scale_averaged);
-
-    //r_both_Si7021(&(hive.humidity), &(hive.temperature));
+    r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
     if(r_push_button())
     {
       toggle_switch_state();
-      power_SIM808();
-      HAL_Delay(50);
-      put_s_SIM808("ATE0\r");     // disable echo mode
+
     }
 
     if(get_switch_state())
@@ -124,21 +124,21 @@ int main(void)
         reset_debug_input();
         break;
       }
-      case 7:
-      {
-        put_s_SIM808("AT+CCLK?\r"); // get clock
-        reset_debug_input();
-        break;
-      }
-      case 11:
+      case 6:
       {
         cmd_vcc_SIM808();
         reset_debug_input();
         break;
       }
-      case 12:
+      case 7:
       {
-        put_s_SIM808("AT+GMR\r"); // software revision
+        _4V2_converter_set(False);
+        reset_debug_input();
+        break;
+      }
+      case 8:
+      {
+        _4V2_converter_set(True);
         reset_debug_input();
         break;
       }
