@@ -36,6 +36,36 @@ void USART1_IRQHandler()
 {
   //HAL_UART_IRQHandler(&huart1);
 
+  /* UART parity error interrupt occurred -------------------------------------*/
+  if((__HAL_UART_GET_IT(&huart1, UART_IT_PE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_PE) != RESET))
+  {
+    __HAL_UART_CLEAR_IT(&huart1, UART_CLEAR_PEF);
+
+    huart1.ErrorCode |= HAL_UART_ERROR_PE;
+    /* Set the UART state ready to be able to start again the process */
+    huart1.State = HAL_UART_STATE_READY;
+  }
+
+  /* UART frame error interrupt occurred --------------------------------------*/
+  if((__HAL_UART_GET_IT(&huart1, UART_IT_FE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_ERR) != RESET))
+  {
+    __HAL_UART_CLEAR_IT(&huart1, UART_CLEAR_FEF);
+
+    huart1.ErrorCode |= HAL_UART_ERROR_FE;
+    /* Set the UART state ready to be able to start again the process */
+    huart1.State = HAL_UART_STATE_READY;
+  }
+
+  /* UART noise error interrupt occurred --------------------------------------*/
+  if((__HAL_UART_GET_IT(&huart1, UART_IT_NE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_ERR) != RESET))
+  {
+    __HAL_UART_CLEAR_IT(&huart1, UART_CLEAR_NEF);
+
+    huart1.ErrorCode |= HAL_UART_ERROR_NE;
+    /* Set the UART state ready to be able to start again the process */
+    huart1.State = HAL_UART_STATE_READY;
+  }
+
   /* UART Over-Run interrupt occurred -----------------------------------------*/
   if((__HAL_UART_GET_IT(&huart1, UART_IT_ORE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_ERR) != RESET))
   {
@@ -43,7 +73,7 @@ void USART1_IRQHandler()
 
     huart1.ErrorCode |= HAL_UART_ERROR_ORE;
     /* Set the UART state ready to be able to start again the process */
-    //huart1.State = HAL_UART_STATE_READY;
+    huart1.State = HAL_UART_STATE_READY;
   }
 
   /* UART in mode Receiver ---------------------------------------------------*/
