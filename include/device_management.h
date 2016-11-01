@@ -29,6 +29,7 @@ typedef struct device
   uint16_t vbat;
   uint16_t current;
   uint16_t MCU_vcc;
+  uint16_t SIM808_vcc;
 
   float MCU_temperature;
   float GYRO_temperature;

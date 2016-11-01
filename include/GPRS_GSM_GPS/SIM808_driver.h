@@ -10,9 +10,14 @@
 
 #include "types.h"
 
+typedef void (*callback_t)(void);
+
 extern uint8_t rx_buffer_SIM808[160];
-extern boolean_t rx_cmplt;
-extern boolean_t check_in_isr;
+extern boolean_t rx_cmplt, rx_error;
+extern uint8_t rx_cnt, cr_cnt, cr_limit;
+extern callback_t *rx_callback;
+
+uint16_t length(char* message);
 
 /*
  *  Sets the default state of the RST and PWRKEY pins.
@@ -44,41 +49,22 @@ void reset_SIM808(void);
 void put_c_SIM808(uint8_t c);
 
 /*
- *  Sends a string to the module.
+ *  Sends a string to the module, returns sent byte number.
  */
-void put_s_SIM808(char* string);
+uint16_t put_s_SIM808(char* string);
+
+/*
+ * Calls UART_receive_IT
+ *
+ * Params:
+ * @cr_lmt: number of '\r' to be received before rx complete
+ * @callback: function to be called to process
+ */
+void get_s_SIM808(uint8_t cr_lmt, callback_t *callback);
 
 /*
  *  Sends default configuration if the module is powered.
  */
 void configure_SIM808(void);
-
-/*
- * Sends a message and check if response matches
- * the pattern.
- *
- * @param msg: string to be sent
- * @param pattern: text to be checked in the answer
- * @param length: expected response length
- * @param to: timeout value
- *
- * @retval:
- * False in case of mismatch or timeout
- * True in case of match
- */
-boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint32_t to);
-
-/*
- * Sends a message and waits until the response is received.
- *
- * @param msg: string to be sent
- * @param length: expected response length
- * @param to: timeout value
- *
- * @retval:
- * False in case timeout
- * True in case of rx complete
- */
-boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint32_t to);
 
 #endif /* SIM808_DRIVER_H_ */

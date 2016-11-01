@@ -11,18 +11,16 @@
 #include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
-#include "string.h"
-
 uint8_t rx_buffer_SIM808[160];
-boolean_t rx_cmplt = False;
-boolean_t check_in_isr = False;
+boolean_t rx_cmplt = False, rx_error = False;
+uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
+callback_t *rx_callback = NULL;
 
 static boolean_t get_SIM808_status(uint32_t to);
-static uint16_t length(char* message);
 
 static boolean_t get_SIM808_status(uint32_t to)
 {
-  return check_resp_SIM808("AT\r","OK", 7, to);
+  return True;
 }
 
 uint16_t length(char* message)
@@ -37,35 +35,24 @@ uint16_t length(char* message)
   return i;
 }
 
-boolean_t check_resp_SIM808(char* msg, char* pattern, uint8_t length, uint32_t to)
-{
-  if(send_n_wait_for_resp(msg, length, to))
-  {
-    if(strstr((char*)rx_buffer_SIM808, pattern) != NULL) // TODO: Null terminate buffer first
-    {
-      return True;
-    }
-  }
-
-  return False;
-}
-
-boolean_t send_n_wait_for_resp(char* msg, uint8_t length, uint32_t to)
-{
-  put_s_SIM808(msg);
-  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, length);
-
-  return waitFor(&rx_cmplt, to);
-}
-
 void put_c_SIM808(uint8_t c)
 {
   HAL_UART_Transmit(&huart1, &c, 1, 0xFFFFFF);
 }
 
-void put_s_SIM808(char* string)
+uint16_t put_s_SIM808(char* string)
 {
-  HAL_UART_Transmit(&huart1, (uint8_t*)string, length(string), 0xFFFFFF);
+  uint16_t size = length(string);
+  HAL_UART_Transmit(&huart1, (uint8_t*)string, size, 0xFFFFFF);
+  return size;
+}
+
+void get_s_SIM808(uint8_t cr_lmt, callback_t *callback)
+{
+  cr_limit = cr_lmt;
+  rx_callback = callback;
+
+  HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 1);
 }
 
 void GPS_ant_pwr(boolean_t val)
