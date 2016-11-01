@@ -5,6 +5,7 @@
  *      Author: Bence
  */
 
+#include <GPRS_GSM_GPS/SIM808_device.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <device_management.h>
 #include "stm32f0xx_hal.h"
@@ -33,7 +34,72 @@ void ADC1_IRQHandler()
 
 void USART1_IRQHandler()
 {
-  HAL_UART_IRQHandler(&huart1);
+  //HAL_UART_IRQHandler(&huart1);
+
+  /* UART Over-Run interrupt occurred -----------------------------------------*/
+  if((__HAL_UART_GET_IT(&huart1, UART_IT_ORE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_ERR) != RESET))
+  {
+    __HAL_UART_CLEAR_IT(&huart1, UART_CLEAR_OREF);
+
+    huart1.ErrorCode |= HAL_UART_ERROR_ORE;
+    /* Set the UART state ready to be able to start again the process */
+    //huart1.State = HAL_UART_STATE_READY;
+  }
+
+  /* UART in mode Receiver ---------------------------------------------------*/
+  if((__HAL_UART_GET_IT(&huart1, UART_IT_RXNE) != RESET) && (__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE) != RESET))
+  {
+    uint16_t uhMask = huart1.Mask;
+
+    if((huart1.State == HAL_UART_STATE_BUSY_RX) || (huart1.State == HAL_UART_STATE_BUSY_TX_RX))
+    {
+      //*huart1.pRxBuffPtr++ = (uint8_t)(huart1.Instance->RDR & (uint8_t)uhMask);
+      uint8_t byte = (uint8_t)(huart1.Instance->RDR & (uint8_t)uhMask);
+      if(byte == '\r')
+      {
+        cr_cnt++;
+      }
+
+      if(rx_cnt < 159)
+      {
+        rx_buffer_SIM808[rx_cnt++] = byte;
+      }
+      else
+      {
+         // TODO: buffer overflow handling
+      }
+
+      if(cr_cnt == cr_limit)
+      {
+        rx_buffer_SIM808[rx_cnt] = 0;
+        rx_cnt = 0;
+        cr_cnt = 0;
+
+        __HAL_UART_DISABLE_IT(&huart1, UART_IT_RXNE);
+
+        // Check if a transmit Process is ongoing or not
+        if(huart1.State == HAL_UART_STATE_BUSY_TX_RX)
+        {
+          huart1.State = HAL_UART_STATE_BUSY_TX;
+        }
+        else
+        {
+          // Disable the UART Parity Error Interrupt
+          __HAL_UART_DISABLE_IT(&huart1, UART_IT_PE);
+
+          // Disable the UART Error Interrupt: (Frame error, noise error, overrun error)
+          __HAL_UART_DISABLE_IT(&huart1, UART_IT_ERR);
+
+          huart1.State = HAL_UART_STATE_READY;
+        }
+
+        process_response_SIM808();
+      }
+    }
+
+    // Clear RXNE interrupt flag
+    __HAL_UART_SEND_REQ(&huart1, UART_RXDATA_FLUSH_REQUEST);
+  }
 }
 
 void RTC_IRQHandler(void)
@@ -64,11 +130,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   {
     rx_cmplt = True;
 
-    if(check_in_isr == True)
-    {
-      check_in_isr = False;
-      //TODO: call processing functions here
-    }
   }
 }
 
@@ -100,10 +161,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 {
+  if(AdcHandle->Instance == ADC1)
+  {
 
+  }
 }
 
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* AdcHandle)
 {
+  if(AdcHandle->Instance == ADC1)
+  {
 
+  }
 }
