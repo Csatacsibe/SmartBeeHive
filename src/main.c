@@ -22,14 +22,15 @@
 #include <weight_measurement.h>
 #include <gyroscope/FXAS21002C_driver.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
+#include <GPRS_GSM_GPS/SIM808_device.h>
 #include <hum_temp_sensor/Si7021_driver.h>
 
 #include "eeprom.h"
 
 void SystemClock_Config(void);
-void static reset_debug_input(void);
+static void reset_debug_input(void);
 
-volatile uint16_t scale_raw, user_input;
+volatile uint16_t scale_raw, user_input = 65535;
 volatile float scale_averaged;
 
 device_t device;
@@ -64,11 +65,13 @@ int main(void)
 
   while (1)
   {
-    device.MCU_vcc         = calculate_MCU_vcc();
-    device.vbat            = r_battery_voltage();
-    device.current         = r_supply_current();
-    device.MCU_temperature = r_MCU_temp();
-    device.charger_status  = r_charger_stat();
+    device.MCU_vcc            = calculate_MCU_vcc();
+    device.vbat               = r_battery_voltage();
+    device.current            = r_supply_current();
+    device.MCU_temperature    = r_MCU_temp();
+    device.charger_status     = r_charger_stat();
+    device.SIM808_temperature = r_temperature_SIM808();
+    device.SIM808_vcc         = r_vcc_SIM808();
 
     scale_raw = process_bridge_output(r_wheatstone_bridge());
     scale_averaged = averaging_filter(scale_raw);
@@ -80,6 +83,9 @@ int main(void)
     if(r_push_button())
     {
       toggle_switch_state();
+      power_SIM808();
+      HAL_Delay(50);
+      put_s_SIM808("ATE0\r");     // disable echo mode
     }
 
     if(get_switch_state())
@@ -114,13 +120,7 @@ int main(void)
       }
       case 5:
       {
-        put_s_SIM808("AT+CMTE?\r"); // get temperature
-        reset_debug_input();
-        break;
-      }
-      case 6:
-      {
-        put_s_SIM808("AT+CANT?\r"); // antenna detection
+        cmd_tmp_SIM808();
         reset_debug_input();
         break;
       }
@@ -130,28 +130,16 @@ int main(void)
         reset_debug_input();
         break;
       }
-      case 8:
-      {
-        put_s_SIM808("AT+CLTS?\r"); // get local timestamp
-        reset_debug_input();
-        break;
-      }
-      case 9:
-      {
-        put_s_SIM808("AT+CSCLK?\r"); // get sleep configuration
-        reset_debug_input();
-        break;
-      }
-      case 10:
-      {
-        put_s_SIM808("ATI\r"); // Display the product name and the product release information.
-        reset_debug_input();
-        break;
-      }
       case 11:
       {
-        put_s_SIM808("AT+CBC=?\r"); // battery info, supply voltage reading
-        reset_debug_input();  
+        cmd_vcc_SIM808();
+        reset_debug_input();
+        break;
+      }
+      case 12:
+      {
+        put_s_SIM808("AT+GMR\r"); // software revision
+        reset_debug_input();
         break;
       }
       default:
@@ -200,7 +188,7 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-void static reset_debug_input()
+static void reset_debug_input()
 {
     user_input = 65535;
     ext_LED(TOGGLE);
