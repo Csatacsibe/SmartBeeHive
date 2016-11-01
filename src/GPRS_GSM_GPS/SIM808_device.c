@@ -29,6 +29,10 @@ void process_response_SIM808()
       rx_error = False;
       process_vcc_reading_SIM808(data);
     }
+    else if(strstr(data, "+CMGS") != NULL)
+    {
+      rx_error = False;
+    }
     else
     {
       rx_error = True;
