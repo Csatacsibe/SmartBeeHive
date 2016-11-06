@@ -16,6 +16,8 @@ boolean_t rx_cmplt = False, rx_error = False;
 uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
 callback_t *rx_callback = NULL;
 
+static boolean_t powered = False;
+
 uint16_t length(char* message)
 {
   uint16_t i;
@@ -26,6 +28,11 @@ uint16_t length(char* message)
   }
 
   return i;
+}
+
+boolean_t is_powered_SIM808(void)
+{
+  return powered;
 }
 
 void put_c_SIM808(uint8_t c)
@@ -72,6 +79,8 @@ void power_SIM808()
   HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_RESET);
   HAL_Delay(1100);
   HAL_GPIO_WritePin(SIM_PWR_KEY_GPIO_Port, SIM_PWR_KEY_Pin, GPIO_PIN_SET);
+
+  powered = ((powered == False) ? True : False);
 }
 
 void reset_SIM808()

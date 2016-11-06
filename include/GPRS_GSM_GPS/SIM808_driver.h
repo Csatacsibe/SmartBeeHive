@@ -72,4 +72,6 @@ void get_s_SIM808(uint8_t cr_lmt, callback_t *callback);
  */
 void configure_SIM808(void);
 
+boolean_t is_powered_SIM808(void);
+
 #endif /* SIM808_DRIVER_H_ */
