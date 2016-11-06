@@ -18,15 +18,17 @@ static float scale_slope = 2.6; // 2.6 mV / 100 g
 static uint16_t unloaded = 0;
 static uint16_t filter_buffer[WINDOW_SIZE];
 
-static float average(uint16_t* buf, uint16_t size);
+//static float average(uint16_t* buf, uint16_t size);
 static void push(uint16_t* buffer, uint16_t size, uint16_t element);
 static void find_min_max(uint16_t* buf, uint16_t* max, uint16_t* min, uint16_t size);
 
 void scale_init()
 {
   uint8_t i;
+  uint16_t mcu_vcc;
 
-  unloaded = r_wheatstone_bridge();  // set null point
+  mcu_vcc = calculate_MCU_vcc();
+  unloaded = r_wheatstone_bridge(mcu_vcc);  // set null point
 
   for(i = 0; i < WINDOW_SIZE; i++)
   {
@@ -34,14 +36,13 @@ void scale_init()
   }
 }
 
-uint16_t r_wheatstone_bridge()
+uint16_t r_wheatstone_bridge(uint16_t mcu_vcc)
 {
   float output;
-  uint16_t mcu_vdd = calculate_MCU_vcc();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(STRAIN_GAUGE);
-  output = (mcu_vdd/4095.0) * digital_val;
+  output = (mcu_vcc/4095.0) * digital_val;
 
   return output;
 }
@@ -92,6 +93,11 @@ float averaging_filter(uint16_t input)
 
 uint32_t mass_in_g(float input)
 {
+  if(input == -1)
+  {
+    return 0;
+  }
+
   uint16_t integer = input;
   uint8_t fraction = (input - integer) * 100;
   uint32_t mass;
@@ -103,7 +109,7 @@ uint32_t mass_in_g(float input)
   return mass * 100;
 }
 
-static float average(uint16_t* buf, uint16_t size)
+/*static float average(uint16_t* buf, uint16_t size)
 {
   uint16_t i;
   float avg = 0;
@@ -114,7 +120,7 @@ static float average(uint16_t* buf, uint16_t size)
   }
 
   return avg/size;
-}
+}*/
 
 static void push(uint16_t* buffer, uint16_t size, uint16_t element)
 {

@@ -13,7 +13,7 @@
 /*
  *  Return the output votlage of the strain gauge Wheatstone bridge in milivolts.
  */
-uint16_t r_wheatstone_bridge(void);
+uint16_t r_wheatstone_bridge(uint16_t mcu_vcc);
 
 uint16_t process_bridge_output(uint16_t value);
 

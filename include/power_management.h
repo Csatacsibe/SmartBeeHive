@@ -62,18 +62,18 @@ uint16_t calculate_MCU_vcc(void);
 /*
  * Returns the battery voltage in milivolts.
  */
-uint16_t r_battery_voltage(void);
+uint16_t r_battery_voltage(uint16_t mcu_vcc);
 
 /*
  * Returns the board supply current in mA.
  */
-uint16_t r_supply_current(void);
+uint16_t r_supply_current(uint16_t mcu_vcc);
 
 /*
  * Reads the MCU internal temperature sensor.
  * Returns the temperature in °C.
  */
-float r_MCU_temp(void);
+float r_MCU_temp(uint16_t mcu_vcc);
 
 /*
  * The MCU enters the power saving mode selected by @param mode.

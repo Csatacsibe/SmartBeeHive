@@ -1,7 +1,8 @@
 #include <STM32_bsp/adc.h>
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
-#include "power_management.h"
+#include <power_management.h>
+#include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
 static float I_SENSE_GAIN = 0.7256;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
@@ -60,44 +61,41 @@ uint16_t calculate_MCU_vcc()
   return analog_Vdd * 1000;
 }
 
-uint16_t r_battery_voltage()
+uint16_t r_battery_voltage(uint16_t mcu_vcc)
 {
   float vbat;
-  uint16_t mcu_vdd = calculate_MCU_vcc();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(BATTERY_VOLTAGE);
-  vbat = (mcu_vdd/4095.0) * digital_val;
+  vbat = (mcu_vcc/4095.0) * digital_val;
   vbat = vbat * 2;         // 1/2 voltage divider
 
   return vbat;
 }
 
-uint16_t r_supply_current()
+uint16_t r_supply_current(uint16_t mcu_vcc)
 {
   float v_sense, current;
-  uint16_t mcu_vdd = calculate_MCU_vcc();
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(SUPPLY_CURRENT);
-  v_sense = (mcu_vdd/4095.0) * digital_val;
+  v_sense = (mcu_vcc/4095.0) * digital_val;
   current = v_sense * I_SENSE_GAIN;
 
   return current;
 }
 
-float r_MCU_temp()
+float r_MCU_temp(uint16_t mcu_vcc)
 {
   float temp;
-  uint16_t mcu_vdd = calculate_MCU_vcc();
   float slope = (110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR));
 
   uint16_t ts_data = r_single_int_channel_ADC(ADC_CHANNEL_TEMPSENSOR);
 
-  temp = ((mcu_vdd/FACTORY_CALIB_VDD) * ts_data)/1000;
+  temp = ((mcu_vcc/FACTORY_CALIB_VDD) * ts_data)/1000;
   temp = slope * (temp - (*TEMP30_CAL_ADDR)) + 30;
 
-  return temp;
+  return round_to(temp, 0);
 }
 
 void enter_mode(power_saving_mode_t mode)
