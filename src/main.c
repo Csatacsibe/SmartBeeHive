@@ -62,30 +62,38 @@ int main(void)
 
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
-  /*power_SIM808();
-  HAL_Delay(50);
-  put_s_SIM808("ATE0\r");*/     // disable echo mode
 
   while (1)
   {
     device.MCU_vcc            = calculate_MCU_vcc();
-    device.vbat               = r_battery_voltage();
-    device.current            = r_supply_current();
-    device.MCU_temperature    = r_MCU_temp();
+    device.vbat               = r_battery_voltage(device.MCU_vcc);
+    device.current            = r_supply_current(device.MCU_vcc);
+    device.MCU_temperature    = r_MCU_temp(device.MCU_vcc);
     device.charger_status     = r_charger_stat();
     device.SIM808_temperature = r_temperature_SIM808();
     device.SIM808_vcc         = r_vcc_SIM808();
 
-    scale_raw = process_bridge_output(r_wheatstone_bridge());
+    scale_raw = process_bridge_output(r_wheatstone_bridge(device.MCU_vcc));
     scale_averaged = averaging_filter(scale_raw);
 
     hive.mass = mass_in_g(scale_averaged);
     r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
+    if(is_powered_SIM808())
+    {
+      cmd_vcc_SIM808();
+      HAL_Delay(20);
+      cmd_tmp_SIM808();
+    }
+    else
+    {
+      ext_LED(TOGGLE);
+    }
+
     if(r_push_button())
     {
       toggle_switch_state();
-
+      power_SIM808();
     }
 
     if(get_switch_state())
@@ -112,12 +120,6 @@ int main(void)
         reset_debug_input();
         break;
       }
-      case 4:
-      {
-        put_s_SIM808("ATE0\r");     // disable echo mode
-        reset_debug_input();
-        break;
-      }
       case 5:
       {
         cmd_tmp_SIM808();
@@ -139,6 +141,54 @@ int main(void)
       case 8:
       {
         _4V2_converter_set(True);
+        reset_debug_input();
+        break;
+      }
+      case 9:
+      {
+        put_s_SIM808("AT+CANT=1,1,10\r");
+        reset_debug_input();
+        break;
+      }
+      case 10:
+      {
+        put_s_SIM808("AT+CSQ\r"); // signal strength
+        reset_debug_input();
+        break;
+      }
+      case 11:
+      {
+        put_s_SIM808("AT+CPOL?\r"); // preferred operator list
+        reset_debug_input();
+        break;
+      }
+      case 12:
+      {
+        put_s_SIM808("AT+COPN\r"); // read operator names
+        reset_debug_input();
+        break;
+      }
+      case 13:
+      {
+        put_s_SIM808("AT+CSPN?\r"); // AT+CSPN Get Service Provider Name from SIM
+        reset_debug_input();
+        break;
+      }
+      case 14:
+      {
+        put_s_SIM808("AT+COPS?\r");
+        reset_debug_input();
+        break;
+      }
+      case 15:
+      {
+        put_s_SIM808("AT+CMEE=2\r"); // Enable +CME ERROR: <err> result code and use verbose <err> values
+        reset_debug_input();
+        break;
+      }
+      case 16:
+      {
+        put_s_SIM808("AT&W\r"); // save config
         reset_debug_input();
         break;
       }
