@@ -6,8 +6,8 @@
  */
 
 #include <hum_temp_sensor/Si7021_driver.h>
+#include <device_management.h>
 #include <STM32_bsp/i2c.h>
-
 
 static const uint16_t i2c_addr = (0x40<<1); // Si7021 I2C address
 
@@ -83,10 +83,12 @@ void r_single_Si7021(float* data, Si7021_measurement_type_t type)
 	if(type == Humidity)
 	{
 		*data = process_humi_code(code);
+		*data = round_to(*data, 0);
 	}
 	else if(type == Temperature)
 	{
 		*data = process_temp_code(code);
+		*data = round_to(*data, 1);
 	}
 }
 
@@ -101,6 +103,7 @@ void r_both_Si7021(float* humidity, float* temperature)
 
 	code = convert_to_uint16(buffer);
 	*humidity = process_humi_code(code);
+	*humidity = round_to(*humidity, 0);
 
 	// There is a temperature measurement with each RH measurement
 	cmd = Temp_AH;
@@ -110,6 +113,7 @@ void r_both_Si7021(float* humidity, float* temperature)
 
 	code = convert_to_uint16(buffer);
 	*temperature = process_temp_code(code);
+	*temperature = round_to(*temperature, 1);
 }
 
 int8_t r_firmware_rev_Si7021()
@@ -187,13 +191,13 @@ void set_resolution_Si7021(Si7021_resolution_t resolution)
 	{
 		case H12_T14:
 		{
-			bitfield = ~(1<<RES1) & ~(1<<RES0);
+			bitfield = (uint8_t)(~(1<<RES1) & ~(1<<RES0));
 			w_reg_Si7021(bitfield, reset_bit, User_Register_1);
 			break;
 		}
 		case H8_T12:
 		{
-			bitfield = ~(1<<RES1);
+			bitfield = (uint8_t)(~(1<<RES1));
 			w_reg_Si7021(bitfield, reset_bit, User_Register_1);
 
 			bitfield = (1<<RES0);

@@ -82,4 +82,9 @@ void measure_RTC_1min(void);
  */
 uint32_t get_RTC_min_val(void);
 
+/*
+ * Returns "val" rounded to "frac" number of fractional digits.
+ */
+float round_to(float val, uint8_t frac);
+
 #endif /* DEVICE_MANAGEMENT_H_ */

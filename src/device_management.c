@@ -6,6 +6,7 @@
  */
 
 #include "device_management.h"
+#include "math.h"
 
 
 static volatile boolean_t switch_state = False;
@@ -83,15 +84,7 @@ boolean_t get_switch_state()
 
 void toggle_switch_state()
 {
-  switch(switch_state)
-  {
-    case True:  switch_state = False;
-      break;
-    case False: switch_state = True;
-      break;
-    default:
-      break;
-  }
+  switch_state = ((switch_state == True) ? False : True);
 }
 
 void measure_RTC_1min()
@@ -113,5 +106,31 @@ void measure_RTC_1min()
 uint32_t get_RTC_min_val()
 {
   return rtc_min_val;
+}
+
+float round_to(float val, uint8_t frac)
+{
+    uint16_t divider = 0;
+
+    switch(frac)
+    {
+        case 0:
+            divider = 1;
+            break;
+        case 1:
+            divider = 10;
+            break;
+        case 2:
+            divider = 100;
+            break;
+        case 3:
+            divider = 1000;
+            break;
+        default:
+            divider = 10;
+            break;
+    }
+
+    return roundf(val * (divider)) / (divider);
 }
 
