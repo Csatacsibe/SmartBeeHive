@@ -61,11 +61,9 @@ typedef enum Si7021_heater_current // Assuming VDD = 3.3 V
 }Si7021_heater_current_t;
 
 int8_t    r_firmware_rev_Si7021(void);
-uint8_t   r_reg_Si7021(Si7021_registers_t reg);
 boolean_t VDD_warning_Si7021(void);
 void      r_single_Si7021(float* data, Si7021_measurement_type_t type);
 void      r_both_Si7021(float* humidity, float* temperature);
-void      w_reg_Si7021(uint8_t bit_field, io_operation_t io, Si7021_registers_t reg);
 void      set_resolution_Si7021(Si7021_resolution_t resolution);
 void      set_heater_current_Si7021(Si7021_heater_current_t val);
 void      c_heater_Si7021(boolean_t val);

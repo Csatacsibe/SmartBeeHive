@@ -22,9 +22,14 @@ static const uint8_t HEATER1 = 1;
 static const uint8_t HEATER2 = 2;
 static const uint8_t HEATER3 = 3;
 
+static uint8_t user_register_1 = 0b00111010;
+static uint8_t heater_control_register = 0b00000000;
+
 static float process_temp_code(uint16_t temp_code);
 static float process_humi_code(uint16_t humi_code);
 static uint16_t convert_to_uint16(uint8_t bytes[]);
+static void w_reg(uint8_t bit_field, Si7021_registers_t reg);
+static uint8_t r_reg(Si7021_registers_t reg);
 
 static float process_temp_code(uint16_t temp_code)
 {
@@ -135,35 +140,40 @@ int8_t r_firmware_rev_Si7021()
 	}
 }
 
-uint8_t r_reg_Si7021(Si7021_registers_t reg)
+static uint8_t r_reg(Si7021_registers_t reg)
 {
 	uint8_t cmd;
-	uint8_t data;
+	uint8_t* data;
 
 	if(reg == User_Register_1)
 	{
 		cmd = R_RHT_U_reg;
+		data = &(user_register_1);
 	}
 	else if(reg == Heater_Control_Register)
 	{
 		cmd = R_Heater_C_reg;
+		data = &(heater_control_register);
+	}
+	else
+	{
+	  return 0;
 	}
 
 	HAL_I2C_Master_Transmit(&hi2c1, i2c_addr, &cmd, 1, 10000);
-	HAL_I2C_Master_Receive(&hi2c1, i2c_addr, &data, 1, 10000);
+	HAL_I2C_Master_Receive(&hi2c1, i2c_addr, data, 1, 10000);
 
-	return data;
+	return *data;
 }
 
-void w_reg_Si7021(uint8_t bit_field, io_operation_t io, Si7021_registers_t reg)
+static void w_reg(uint8_t bit_field, Si7021_registers_t reg)
 {
 	uint8_t cmd[2];
-
-	cmd[1] = r_reg_Si7021(reg);
+  cmd[1] = bit_field;
 
 	if(reg == User_Register_1)
 	{
-		bit_field |= UR_bitmask;
+  	bit_field |= UR_bitmask;
 		cmd[0] = W_RHT_U_reg;
 	}
 	else if(reg == Heater_Control_Register)
@@ -171,52 +181,37 @@ void w_reg_Si7021(uint8_t bit_field, io_operation_t io, Si7021_registers_t reg)
 		cmd[0] = W_Heater_C_reg;
 	}
 
-	if(io == set_bit)
-	{
-		cmd[1] |= bit_field;
-	}
-	else if(io == reset_bit)
-	{
-		cmd[1] &= bit_field;
-	}
-
 	HAL_I2C_Master_Transmit(&hi2c1, i2c_addr, cmd, 2, 10000);
 }
 
 void set_resolution_Si7021(Si7021_resolution_t resolution)
 {
-	uint8_t bitfield;
-
 	switch(resolution)
 	{
 		case H12_T14:
 		{
-			bitfield = (uint8_t)(~(1<<RES1) & ~(1<<RES0));
-			w_reg_Si7021(bitfield, reset_bit, User_Register_1);
+			user_register_1 &= (uint8_t)(~(1<<RES1) & ~(1<<RES0));
+			w_reg(user_register_1, User_Register_1);
 			break;
 		}
 		case H8_T12:
 		{
-			bitfield = (uint8_t)(~(1<<RES1));
-			w_reg_Si7021(bitfield, reset_bit, User_Register_1);
-
-			bitfield = (1<<RES0);
-			w_reg_Si7021(bitfield, set_bit, User_Register_1);
+		  user_register_1 &= (uint8_t)(~(1<<RES1));
+			user_register_1 |= (1<<RES0);
+			w_reg(user_register_1, User_Register_1);
 			break;
 		}
 		case H10_T13:
 		{
-			bitfield = ~(1<<RES0);
-			w_reg_Si7021(bitfield, reset_bit, User_Register_1);
-
-			bitfield = (1<<RES1);
-			w_reg_Si7021(bitfield, set_bit, User_Register_1);
+		  user_register_1 &= ~(1<<RES0);
+			user_register_1 |= (1<<RES1);
+			w_reg(user_register_1, User_Register_1);
 			break;
 		}
 		case H11_T11:
 		{
-			bitfield = (1<<RES1) | (1<<RES0);
-			w_reg_Si7021(bitfield, set_bit, User_Register_1);
+		  user_register_1 |= (1<<RES1) | (1<<RES0);
+			w_reg(user_register_1, User_Register_1);
 			break;
 		}
 		default: return;
@@ -225,56 +220,46 @@ void set_resolution_Si7021(Si7021_resolution_t resolution)
 
 void set_heater_current_Si7021(Si7021_heater_current_t val)
 {
-	uint8_t bitfield;
-
 	switch(val)
 	{
 		case _3_mA:
 		{
-			bitfield = ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER2) & ~(1<<HEATER3);
-			w_reg_Si7021(bitfield, reset_bit, Heater_Control_Register);
+		  heater_control_register &= ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER2) & ~(1<<HEATER3);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		case _9_mA:
 		{
-			bitfield = ~(1<<HEATER1) & ~(1<<HEATER2) & ~(1<<HEATER3);
-			w_reg_Si7021(bitfield, reset_bit, Heater_Control_Register);
-
-			bitfield = (1<<HEATER0);
-			w_reg_Si7021(bitfield, set_bit, Heater_Control_Register);
+		  heater_control_register &= ~(1<<HEATER1) & ~(1<<HEATER2) & ~(1<<HEATER3);
+			heater_control_register |= (1<<HEATER0);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		case _15_mA:
 		{
-			bitfield = ~(1<<HEATER0) & ~(1<<HEATER2) & ~(1<<HEATER3);
-			w_reg_Si7021(bitfield, reset_bit, Heater_Control_Register);
-
-			bitfield = (1<<HEATER1);
-			w_reg_Si7021(bitfield, set_bit, Heater_Control_Register);
+		  heater_control_register &= ~(1<<HEATER0) & ~(1<<HEATER2) & ~(1<<HEATER3);
+			heater_control_register |= (1<<HEATER1);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		case _27_mA:
 		{
-			bitfield = ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER3);
-			w_reg_Si7021(bitfield, reset_bit, Heater_Control_Register);
-
-			bitfield = (1<<HEATER2);
-			w_reg_Si7021(bitfield, set_bit, Heater_Control_Register);
+		  heater_control_register &= ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER3);
+			heater_control_register |= (1<<HEATER2);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		case _51_mA:
 		{
-			bitfield = ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER2);
-			w_reg_Si7021(bitfield, reset_bit, Heater_Control_Register);
-
-			bitfield = (1<<HEATER3);
-			w_reg_Si7021(bitfield, set_bit, Heater_Control_Register);
+		  heater_control_register &= ~(1<<HEATER0) & ~(1<<HEATER1) & ~(1<<HEATER2);
+			heater_control_register |= (1<<HEATER3);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		case _94_mA:
 		{
-			bitfield = (1<<HEATER0) | (1<<HEATER1) | (1<<HEATER2) | (1<<HEATER3);
-			w_reg_Si7021(bitfield, set_bit, Heater_Control_Register);
+		  heater_control_register |= (1<<HEATER0) | (1<<HEATER1) | (1<<HEATER2) | (1<<HEATER3);
+			w_reg(heater_control_register, Heater_Control_Register);
 			break;
 		}
 		default: return;
@@ -283,7 +268,7 @@ void set_heater_current_Si7021(Si7021_heater_current_t val)
 
 boolean_t VDD_warning_Si7021()
 {
-	uint8_t u_reg = r_reg_Si7021(User_Register_1);
+	uint8_t u_reg = r_reg(User_Register_1);
 
 	if(u_reg & (1<<VDDS))
 	{
@@ -297,17 +282,15 @@ boolean_t VDD_warning_Si7021()
 
 void c_heater_Si7021(boolean_t val)
 {
-    uint8_t bitfield;
-
     if(val == True)
     {
-    	bitfield = (1<<HTRE);
-    	w_reg_Si7021(bitfield, set_bit, User_Register_1);
+      user_register_1 |= (1<<HTRE);
+    	w_reg(user_register_1, User_Register_1);
     }
     else
     {
-    	bitfield = ~(1<<HTRE);
-    	w_reg_Si7021(bitfield, reset_bit, User_Register_1);
+      user_register_1 &= ~(1<<HTRE);
+    	w_reg(user_register_1, User_Register_1);
     }
 }
 
