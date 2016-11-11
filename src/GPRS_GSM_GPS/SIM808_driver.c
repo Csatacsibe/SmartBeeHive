@@ -37,20 +37,20 @@ boolean_t is_powered_SIM808(void)
 
 void put_c_SIM808(uint8_t c)
 {
-  HAL_UART_Transmit(&huart1, &c, 1, 0xFFFFFF);
+  HAL_UART_Transmit(&huart1, &c, 1, 1000);
 }
 
 uint8_t get_c_SIM808()
 {
   uint8_t retval = 0;
-  HAL_UART_Receive(&huart1, &retval, 1, 100);
+  HAL_UART_Receive(&huart1, &retval, 1, 5000);
   return retval;
 }
 
 uint16_t put_s_SIM808(char* string)
 {
   uint16_t size = length(string);
-  HAL_UART_Transmit(&huart1, (uint8_t*)string, size, 0xFFFFFF);
+  HAL_UART_Transmit(&huart1, (uint8_t*)string, size, 1000);
   return size;
 }
 
@@ -88,12 +88,6 @@ void reset_SIM808()
   HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_RESET);
   HAL_Delay(150);
   HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);
-}
-
-void configure_SIM808()
-{
-  put_s_SIM808("ATE0\r");      // disable command echo mode
-  put_s_SIM808("AT+CMGF=1\r"); // set SMS system into text mode
 }
 
 void SIM808_init()

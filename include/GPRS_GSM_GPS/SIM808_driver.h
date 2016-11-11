@@ -10,7 +10,7 @@
 
 #include "types.h"
 
-typedef void (*callback_t)(void);
+typedef void (*callback_t)(char* data);
 
 extern uint8_t rx_buffer_SIM808[160];
 extern boolean_t rx_cmplt, rx_error;
@@ -66,11 +66,6 @@ uint16_t put_s_SIM808(char* string);
  * @callback: function to be called to process
  */
 void get_s_SIM808(uint8_t cr_lmt, callback_t *callback);
-
-/*
- *  Sends default configuration if the module is powered.
- */
-void configure_SIM808(void);
 
 boolean_t is_powered_SIM808(void);
 
