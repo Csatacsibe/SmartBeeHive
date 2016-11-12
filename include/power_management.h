@@ -28,7 +28,7 @@ typedef enum power_saving_mode
  *  val: True  = enable
  *       False = disable
  */
-void _4V2_converter_set(boolean_t val);
+void enable_4V2_converter(boolean_t val);
 
 /*
  *  enable/disable MCP73832 LiPo charger

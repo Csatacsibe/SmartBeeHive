@@ -5,10 +5,10 @@
 #include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
-static float I_SENSE_GAIN = 0.7256;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
+static float I_SENSE_GAIN = 0.7143;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
 static float FACTORY_CALIB_VDD = 3.31;
 
-void _4V2_converter_set(boolean_t val)
+void enable_4V2_converter(boolean_t val)
 {
   if(val == True)
   {
@@ -47,7 +47,7 @@ boolean_t r_charger_stat()
 
 void power_mngt_init()
 {
-  _4V2_converter_set(True); // default value: 4V2 rail enabled
+  enable_4V2_converter(True); // default value: 4V2 rail enabled
   enable_bat_charger(False);  // default value: LiPo charger disabled
 }
 
@@ -85,10 +85,10 @@ uint16_t r_supply_current(uint16_t mcu_vcc)
   return current;
 }
 
-float r_MCU_temp(uint16_t mcu_vcc)
+uint8_t r_MCU_temp(uint16_t mcu_vcc)
 {
   float temp;
-  float slope = (110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR));
+  float slope = ((110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR)))/1000.0;
 
   uint16_t ts_data = r_single_int_channel_ADC(ADC_CHANNEL_TEMPSENSOR);
 
@@ -100,7 +100,7 @@ float r_MCU_temp(uint16_t mcu_vcc)
 
 void enter_mode(power_saving_mode_t mode)
 {
-  _4V2_converter_set(False);
+  enable_4V2_converter(False);
   GPS_ant_pwr(False);
 
   HAL_SuspendTick();

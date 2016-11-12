@@ -58,7 +58,7 @@ int main(void)
   FXAS21002C_init();
   scale_init();
 
-  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+  //__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
@@ -134,13 +134,13 @@ int main(void)
       }
       case 7:
       {
-        _4V2_converter_set(False);
+        enable_4V2_converter(False);
         reset_debug_input();
         break;
       }
       case 8:
       {
-        _4V2_converter_set(True);
+        enable_4V2_converter(True);
         reset_debug_input();
         break;
       }
