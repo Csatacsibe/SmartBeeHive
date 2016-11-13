@@ -12,15 +12,16 @@
 static const uint16_t i2c_addr = (0x40<<1); // Si7021 I2C address
 
 static const uint8_t UR_bitmask = 0x3A;     // Reset Settings = 0011_1010, (reserved bits)
-static const uint8_t RES0 = 0;
-static const uint8_t RES1 = 7;
-static const uint8_t VDDS = 6;    		    	// read only
-static const uint8_t HTRE = 2;
 
-static const uint8_t HEATER0 = 0;
-static const uint8_t HEATER1 = 1;
-static const uint8_t HEATER2 = 2;
-static const uint8_t HEATER3 = 3;
+#define RES0 0
+#define RES1 7
+#define VDDS 6    		    	                // read only
+#define HTRE 2
+
+#define HEATER0 0
+#define HEATER1 1
+#define HEATER2 2
+#define HEATER3 3
 
 static uint8_t user_register_1 = 0b00111010;
 static uint8_t heater_control_register = 0b00000000;
