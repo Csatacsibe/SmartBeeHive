@@ -85,7 +85,7 @@ uint16_t r_supply_current(uint16_t mcu_vcc)
   return current;
 }
 
-uint8_t r_MCU_temp(uint16_t mcu_vcc)
+float r_MCU_temp(uint16_t mcu_vcc)
 {
   float temp;
   float slope = ((110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR)))/1000.0;

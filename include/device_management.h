@@ -31,8 +31,8 @@ typedef struct device
   uint16_t MCU_vcc;
   uint16_t SIM808_vcc;
 
-  float MCU_temperature;
-  float GYRO_temperature;
+  int8_t MCU_temperature;
+  int8_t GYRO_temperature;
   float SIM808_temperature;
 
   boolean_t charger_status;

@@ -16,9 +16,9 @@
 
 typedef enum power_saving_mode
 {
-  SLEEP  = 1,
-  STOP = 2,
-  STANDBY = 3
+  SLEEP  = 0,
+  STOP = 1,
+  STANDBY = 2
 }power_saving_mode_t;
 
 /*
