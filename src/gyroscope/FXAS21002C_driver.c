@@ -16,6 +16,13 @@ static const uint16_t i2c_addr = (0x20<<1); // FXAS21002 I2C address
 #define BOOTEND  3 // Boot sequence complete event flag
 #define SRC_RT   1 // Rate threshold event source flag
 
+/* CTRL_REG0 register bits*/
+#define FS1 1 // Full-scale range selection
+#define FS0 0 // Full-scale range selection
+
+/* CTRL_REG3 register bits */
+#define FS_DOUBLE 0 // Full-scale range expansion enable, double it
+
 /* RT_CFG register bits */
 #define ELE   3 // Event latch enable
 #define ZTEFE 2 // Event flag enable on Z-axis rate
@@ -52,6 +59,8 @@ static const uint16_t i2c_addr = (0x20<<1); // FXAS21002 I2C address
 
 static void r_regs_FXAS21002C(FXAS21002C_registers_t address, uint16_t reg_nbr, uint8_t buffer[]);
 static void w_regs_FXAS21002C(FXAS21002C_registers_t address, uint16_t reg_nbr, uint8_t buffer[]);
+static void s_double_FS_FXAS21002C(boolean_t enable);
+static boolean_t is_FS_doubled_FXAS21002C(void);
 
 static void r_regs_FXAS21002C(FXAS21002C_registers_t address, uint16_t reg_nbr, uint8_t buffer[])
 {
@@ -262,14 +271,24 @@ void s_RT_DCnt_mode_FXAS21002C(boolean_t set)
   w_regs_FXAS21002C(RT_THS, 1, &reg);
 }
 
-void s_RT_threshold_FXAS21002C(uint8_t value)
+void s_RT_threshold_FXAS21002C(uint16_t dps)
 {
-  uint8_t reg;
+  uint8_t reg, ths;
+  uint16_t fsr;
+  float sensitivity;
+
+  fsr = r_FSR_FXAS21002C();
   r_regs_FXAS21002C(RT_THS, 1, &reg);
 
-  reg   &= (1<<DBCNTM);
-  value &= ~(1<<DBCNTM);
-  reg   |= value;
+  if(dps > fsr * 0.95)
+      dps = fsr * 0.95;
+
+  sensitivity = (fsr/1000.0)/32.0;
+  ths = (dps/(sensitivity * 256)) - 1;
+
+  reg &= (1<<DBCNTM);
+  ths &= ~(1<<DBCNTM);
+  reg |= ths;
 
   w_regs_FXAS21002C(RT_THS, 1, &reg);
 }
@@ -288,4 +307,77 @@ uint8_t calculate_RT_DCnt_value(uint16_t milisec)
 void s_RT_count_FXAS21002C(uint8_t value)
 {
   w_regs_FXAS21002C(RT_COUNT, 1, &value);
+}
+
+void s_FSR_FXAS21002C(FXAS21002C_FSR_t range)
+{
+  uint8_t reg;
+  boolean_t set_doubled = False;
+  r_regs_FXAS21002C(CTRL_REG0, 1, &reg);
+
+  switch(range)
+  {
+    case _4000_dps:
+      set_doubled = True;
+      reg &= ~(1<<FS1) & ~(1<<FS0);
+      break;
+    case _2000_dps:
+      reg &= ~(1<<FS1) & ~(1<<FS0);
+      break;
+    case _1000_dps:
+      reg &= ~(1<<FS1);
+      reg |= (1<<FS0);
+      break;
+    case _500_dps:
+      reg &= ~(1<<FS0);
+      reg |= (1<<FS1);
+      break;
+    case _250_dps:
+      reg |= (1<<FS1) | (1<<FS0);
+      break;
+    default:
+      return;
+  }
+
+  s_double_FS_FXAS21002C(set_doubled);
+  w_regs_FXAS21002C(CTRL_REG0, 1, &reg);
+}
+
+FXAS21002C_FSR_t r_FSR_FXAS21002C()
+{
+  uint8_t reg;
+  boolean_t doubled = is_FS_doubled_FXAS21002C();
+  r_regs_FXAS21002C(CTRL_REG0, 1, &reg);
+
+  reg &= (1<<FS1) | (1<<FS0);
+
+  switch(reg)
+  {
+    case 0:  return (_2000_dps * (doubled + 1));
+    case 1:  return (_1000_dps * (doubled + 1));
+    case 2:  return (_500_dps * (doubled + 1));
+    case 3:  return (_250_dps * (doubled + 1));
+    default: return 0;
+  }
+}
+
+static void s_double_FS_FXAS21002C(boolean_t enable)
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+
+  if(enable == True)
+    reg |= (1<<FS_DOUBLE);
+  else
+    reg &= ~(1<<FS_DOUBLE);
+
+  w_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+}
+
+static boolean_t is_FS_doubled_FXAS21002C()
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+
+  return (reg & (1<<FS_DOUBLE));
 }
