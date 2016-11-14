@@ -41,44 +41,51 @@ typedef enum FXAS21002C_registers
 	RT_THS   = 0x10, // R/W
 	RT_COUNT = 0x11, // R/W
 
-	TEMP = 0x12,
+	TEMP = 0x12
 
 }FXAS21002C_registers_t;
 
-/*
- *  read registers of device
- *
- *  params:
- *  reg:     First register's address (auto increment by device afterward)
- *  reg_nbr: Number of registers to be read
- *  buffer:  Buffer to store register content(s)
- */
-void r_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buffer[]);
+typedef enum FXAS21002C_mode
+{
+  Active  = 2,
+  Ready   = 1,
+  Standby = 0,
+}FXAS21002C_modes_t;
 
-/*
- *  write registers of device
- *
- *  params:
- *  reg:     First register's address (auto increment by device afterward)
- *  reg_nbr: Number of registers to be written
- *  buffer:  Buffer of value(s) to be written
- */
-void w_regs_FXAS21002C(FXAS21002C_registers_t reg, uint16_t reg_nbr, uint8_t buffer[]);
+typedef enum FXAS21002C_ODR
+{
+  _800Hz = 8000,
+  _400Hz = 4000,
+  _200Hz = 2000,
+  _100Hz = 1000,
+  _50Hz  = 500,
+  _25Hz  = 350,
+  _12Hz5 = 125
+}FXAS21002C_ODR_t;
 
-/*
- *  resets FXAS21002C by pulling its RST pin low
- */
+typedef enum FXAS21002C_axis
+{
+  Z_axis = 2,
+  Y_axis = 1,
+  X_axis = 0
+}FXAS21002C_axis_t;
+
+void enter_mode_FXAS21002C(FXAS21002C_modes_t mode);
+FXAS21002C_modes_t r_mode_FXAS21002C(void);
+boolean_t is_boot_ended_FXAS21002(void);
+void s_ODR_FXAS21002C(FXAS21002C_ODR_t rate);
+FXAS21002C_ODR_t r_ODR_FXAS21002C(void);
+void s_selftest_FXAS21002C(boolean_t enable);
 void reset_hard_FXAS21002C(void);
-
-/*
- *  resets FXAS21002C by setting the RST bit
- *  in the CTRL_REG1 register
- */
 void reset_soft_FXAS21002C(void);
-
-/*
- *  Initializes the RST pin
- */
 void FXAS21002C_init(void);
+uint8_t who_am_I_FXAS21002C(void);
+int8_t r_temp_FXAS21002C(void);
+
+void s_RTD_on_axis_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable);
+void s_RT_DCnt_mode_FXAS21002C(boolean_t set);
+uint8_t calculate_RT_DCnt_value(uint16_t milisec);
+void s_RT_count_FXAS21002C(uint8_t value);
+void s_RT_threshold_FXAS21002C(uint8_t value);
 
 #endif /* FXAS21002C_DRIVER_H_ */
