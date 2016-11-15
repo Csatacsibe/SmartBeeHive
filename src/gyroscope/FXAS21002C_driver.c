@@ -91,6 +91,59 @@ static void w_regs_FXAS21002C(FXAS21002C_registers_t address, uint16_t reg_nbr, 
   HAL_I2C_Master_Transmit(&hi2c1, i2c_addr, cmd, reg_nbr + 1, 10000);
 }
 
+static void s_double_FS_FXAS21002C(boolean_t enable)
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+
+  if(enable == True)
+    reg |= (1<<FS_DOUBLE);
+  else
+    reg &= ~(1<<FS_DOUBLE);
+
+  w_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+}
+
+static boolean_t is_FS_doubled_FXAS21002C()
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+
+  return (reg & (1<<FS_DOUBLE));
+}
+
+void FXAS21002C_init()
+{
+  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
+}
+
+void reset_hard_FXAS21002C()
+{
+  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_RESET);
+  HAL_Delay(150);
+  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
+}
+
+void reset_soft_FXAS21002C()
+{
+  uint8_t cmd = (1<<RST);
+
+  w_regs_FXAS21002C(CTRL_REG1, 1, &cmd);
+}
+
+void s_selftest_FXAS21002C(boolean_t enable)
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG1, 1, &reg);
+
+  if(enable == True)
+    reg |= (1<<ST);
+  else
+    reg &= ~(1<<ST);
+
+  w_regs_FXAS21002C(CTRL_REG1, 1, &reg);
+}
+
 void enter_mode_FXAS21002C(FXAS21002C_modes_t mode)
 {
   uint8_t reg;
@@ -121,7 +174,7 @@ FXAS21002C_modes_t r_mode_FXAS21002C()
   uint8_t reg;
   r_regs_FXAS21002C(CTRL_REG1, 1, &reg);
 
-  return (reg &= 0x03);
+  return (reg &= ((1<<ACTIVE) | (1<<READY)));
 }
 
 boolean_t is_boot_ended_FXAS21002(void)
@@ -133,6 +186,20 @@ boolean_t is_boot_ended_FXAS21002(void)
     return True;
   else
     return False;
+}
+
+uint8_t who_am_I_FXAS21002C()
+{
+  uint8_t deviceID = 0;
+  r_regs_FXAS21002C(WHO_AM_I, 1, &deviceID);
+  return deviceID;
+}
+
+int8_t r_temp_FXAS21002C()
+{
+  int8_t temp = 0;
+  r_regs_FXAS21002C(TEMP, 1, (uint8_t*)(&temp));
+  return temp;
 }
 
 void s_ODR_FXAS21002C(FXAS21002C_ODR_t rate)
@@ -199,52 +266,6 @@ FXAS21002C_ODR_t r_ODR_FXAS21002C()
   }
 }
 
-void s_selftest_FXAS21002C(boolean_t enable)
-{
-  uint8_t reg;
-  r_regs_FXAS21002C(CTRL_REG1, 1, &reg);
-
-  if(enable == True)
-    reg |= (1<<ST);
-  else
-    reg &= ~(1<<ST);
-
-  w_regs_FXAS21002C(CTRL_REG1, 1, &reg);
-}
-
-void reset_hard_FXAS21002C()
-{
-  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_RESET);
-  HAL_Delay(150);
-  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
-}
-
-void reset_soft_FXAS21002C()
-{
-  uint8_t cmd = (1<<RST);
-
-  w_regs_FXAS21002C(CTRL_REG1, 1, &cmd);
-}
-
-uint8_t who_am_I_FXAS21002C()
-{
-  uint8_t deviceID = 0;
-  r_regs_FXAS21002C(WHO_AM_I, 1, &deviceID);
-  return deviceID;
-}
-
-int8_t r_temp_FXAS21002C()
-{
-  int8_t temp = 0;
-  r_regs_FXAS21002C(TEMP, 1, (uint8_t*)(&temp));
-  return temp;
-}
-
-void FXAS21002C_init()
-{
-  HAL_GPIO_WritePin(GY_RST_GPIO_Port, GY_RST_Pin, GPIO_PIN_SET);
-}
-
 void s_RTD_on_axis_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable)
 {
   uint8_t reg;
@@ -293,7 +314,7 @@ void s_RT_threshold_FXAS21002C(uint16_t dps)
   w_regs_FXAS21002C(RT_THS, 1, &reg);
 }
 
-uint8_t calculate_RT_DCnt_value(uint16_t milisec)
+uint8_t calculate_RT_DCnt_value_FXAS21002C(uint16_t milisec)
 {
   FXAS21002C_ODR_t odr = r_ODR_FXAS21002C();
   uint16_t max  = (10000/odr) * 255;
@@ -361,23 +382,46 @@ FXAS21002C_FSR_t r_FSR_FXAS21002C()
   }
 }
 
-static void s_double_FS_FXAS21002C(boolean_t enable)
+void enable_RT_intr_on_pin_FXAS21002C(boolean_t enable, FXAS21002C_Intr_pin_t pin)
 {
   uint8_t reg;
-  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+  r_regs_FXAS21002C(CTRL_REG2, 1, &reg);
 
   if(enable == True)
-    reg |= (1<<FS_DOUBLE);
+    reg |= (1<<INT_EN_RT);
   else
-    reg &= ~(1<<FS_DOUBLE);
+    reg &= ~(1<<INT_EN_RT);
 
-  w_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+  if(pin == INT1)
+    reg |= (1<<INT_CFG_RT);
+  else
+    reg &= ~(1<<INT_CFG_RT);
+
+  w_regs_FXAS21002C(CTRL_REG2, 1, &reg);
 }
 
-static boolean_t is_FS_doubled_FXAS21002C()
+void s_interrupt_polarity_FXAS21002C(FXAS21002C_Intr_pin_polarity_t polarity)
 {
   uint8_t reg;
-  r_regs_FXAS21002C(CTRL_REG3, 1, &reg);
+  r_regs_FXAS21002C(CTRL_REG2, 1, &reg);
 
-  return (reg & (1<<FS_DOUBLE));
+  if(polarity == ACTIVE_HIGH)
+    reg |= (1<<IPOL);
+  else
+    reg &= ~(1<<IPOL);
+
+  w_regs_FXAS21002C(CTRL_REG2, 1, &reg);
+}
+
+void s_interrupt_pin_mode_FXAS21002C(FXAS21002C_Intr_pin_mode_t mode)
+{
+  uint8_t reg;
+  r_regs_FXAS21002C(CTRL_REG2, 1, &reg);
+
+  if(mode == OPEN_DRAIN)
+    reg |= (1<<PP_OD);
+  else
+    reg &= ~(1<<PP_OD);
+
+  w_regs_FXAS21002C(CTRL_REG2, 1, &reg);
 }

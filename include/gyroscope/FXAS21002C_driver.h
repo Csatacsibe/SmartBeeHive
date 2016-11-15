@@ -79,6 +79,25 @@ typedef enum FXAS21002C_axis
   X_axis = 0
 }FXAS21002C_axis_t;
 
+typedef enum FXAS21002C_Intr_pin
+{
+  INT1 = 1,
+  INT2 = 2
+}FXAS21002C_Intr_pin_t;
+
+typedef enum FXAS21002C_Intr_pin_polarity
+{
+  ACTIVE_LOW  = 0,
+  ACTIVE_HIGH = 1
+}FXAS21002C_Intr_pin_polarity_t;
+
+typedef enum FXAS21002C_Intr_pin_mode
+{
+  OPEN_DRAIN = 1,
+  PUSH_PULL = 0
+}FXAS21002C_Intr_pin_mode_t;
+
+
 void FXAS21002C_init(void);
 
 void enter_mode_FXAS21002C(FXAS21002C_modes_t mode);
@@ -98,10 +117,15 @@ void reset_soft_FXAS21002C(void);
 uint8_t who_am_I_FXAS21002C(void);
 int8_t r_temp_FXAS21002C(void);
 
-void s_RTD_on_axis_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable);
+void enable_RT_event_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable);
 void s_RT_DCnt_mode_FXAS21002C(boolean_t set);
-uint8_t calculate_RT_DCnt_value(uint16_t milisec);
+uint8_t calculate_RT_DCnt_value_FXAS21002C(uint16_t milisec);
 void s_RT_count_FXAS21002C(uint8_t value);
 void s_RT_threshold_FXAS21002C(uint16_t dps);
+void enable_RT_intr_on_pin_FXAS21002C(boolean_t enable, FXAS21002C_Intr_pin_t pin);
+
+void s_interrupt_polarity_FXAS21002C(FXAS21002C_Intr_pin_polarity_t polarity);
+void s_interrupt_pin_mode_FXAS21002C(FXAS21002C_Intr_pin_mode_t mode);
+
 
 #endif /* FXAS21002C_DRIVER_H_ */
