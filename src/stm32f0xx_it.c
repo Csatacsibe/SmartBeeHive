@@ -8,6 +8,9 @@
 #include <GPRS_GSM_GPS/SIM808_device.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <device_management.h>
+#include <weight_measurement.h>
+#include <STM32_bsp/adc.h>
+
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_it.h"
@@ -153,16 +156,6 @@ void DMA1_Channel1_IRQHandler(void)
   HAL_DMA_IRQHandler(&hdma_adc);
 }
 
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if (huart->Instance == USART1)
-  {
-    rx_cmplt = True;
-
-  }
-}
-
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
   if(hrtc->Instance == RTC)
@@ -193,7 +186,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 {
   if(AdcHandle->Instance == ADC1)
   {
-
+    HAL_ADC_Stop_DMA(AdcHandle);
+    config_ext_channel_ADC(STRAIN_GAUGE, False);
+    scale_sampling_done = True;
   }
 }
 

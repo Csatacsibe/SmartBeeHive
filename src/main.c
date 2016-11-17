@@ -73,10 +73,7 @@ int main(void)
     device.SIM808_temperature = r_temperature_SIM808();
     device.SIM808_vcc         = r_vcc_SIM808();
 
-    scale_raw = process_bridge_output(r_wheatstone_bridge(device.MCU_vcc));
-    scale_averaged = averaging_filter(scale_raw);
-
-    hive.mass = mass_in_g(scale_averaged);
+    hive.mass = measure_mass(device.MCU_vcc);
     r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
     if(is_powered_SIM808())

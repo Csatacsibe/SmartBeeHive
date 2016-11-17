@@ -5,22 +5,33 @@
  *      Author: Bence
  */
 
+#include <device_management.h>
 #include <weight_measurement.h>
 #include <power_management.h>
 #include <STM32_bsp/adc.h>
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
 
-#define WINDOW_SIZE 96
+#define WINDOW_SIZE   48
+#define SAMPLE_NUMBER (uint32_t) 300
 
 static float scale_slope = 2.6; // 2.6 mV / 100 g
 
 static uint16_t unloaded = 0;
 static uint16_t filter_buffer[WINDOW_SIZE];
+static uint32_t mass = 0;
+static uint32_t input_buffer[SAMPLE_NUMBER];
+static uint16_t vcc = 2800;
+
+boolean_t scale_sampling_done = False;
 
 //static float average(uint16_t* buf, uint16_t size);
 static void push(uint16_t* buffer, uint16_t size, uint16_t element);
 static void find_min_max(uint16_t* buf, uint16_t* max, uint16_t* min, uint16_t size);
+static float averaging_filter(uint16_t input);
+static uint16_t r_wheatstone_bridge(uint16_t mcu_vcc);
+static uint16_t process_bridge_output(uint16_t value);
+static uint32_t convert_to_gram(float input);
 
 void scale_init()
 {
@@ -36,7 +47,64 @@ void scale_init()
   }
 }
 
-uint16_t r_wheatstone_bridge(uint16_t mcu_vcc)
+uint32_t measure_mass(uint16_t mcu_vcc)
+{
+  uint16_t scale_raw;
+  float scale_averaged;
+
+  scale_raw = process_bridge_output(r_wheatstone_bridge(mcu_vcc));
+  scale_averaged = averaging_filter(scale_raw);
+
+  return convert_to_gram(scale_averaged);
+}
+
+uint32_t r_hive_mass()
+{
+  return mass;
+}
+
+static uint32_t convert_to_gram(float input)
+{
+  if(input == -1)
+  {
+    return 0;
+  }
+
+  uint32_t mass;
+
+  uint16_t integer = input;
+  uint8_t fraction = (input - integer) * 100;
+  float temp = integer + fraction/100.0;
+
+  temp = temp/scale_slope;
+  mass = temp;
+
+  return mass * 100;
+}
+
+uint16_t start_scale_sampling(uint16_t mcu_vcc)
+{
+  vcc = mcu_vcc;
+  scale_sampling_done = False;
+  config_ext_channel_ADC(STRAIN_GAUGE, True);
+  HAL_ADCEx_Calibration_Start(&hadc);
+  HAL_ADC_Start_DMA(&hadc, input_buffer, SAMPLE_NUMBER);
+}
+
+/*static float average(uint16_t* buf, uint16_t size)
+{
+  uint16_t i;
+  float avg = 0;
+
+  for(i = 0; i < size; i++)
+  {
+    avg += buf[i];
+  }
+
+  return avg/size;
+}*/
+
+static uint16_t r_wheatstone_bridge(uint16_t mcu_vcc)
 {
   float output;
   uint16_t digital_val;
@@ -47,7 +115,7 @@ uint16_t r_wheatstone_bridge(uint16_t mcu_vcc)
   return output;
 }
 
-uint16_t process_bridge_output(uint16_t value)
+static uint16_t process_bridge_output(uint16_t value)
 {
   int16_t temp;
   temp = value - unloaded;
@@ -60,7 +128,7 @@ uint16_t process_bridge_output(uint16_t value)
   return temp;
 }
 
-float averaging_filter(uint16_t input)
+static float averaging_filter(uint16_t input)
 {
   uint16_t i, invalid = 0;
   uint16_t min, max;
@@ -90,37 +158,6 @@ float averaging_filter(uint16_t input)
     return sum;
   }
 }
-
-uint32_t mass_in_g(float input)
-{
-  if(input == -1)
-  {
-    return 0;
-  }
-
-  uint16_t integer = input;
-  uint8_t fraction = (input - integer) * 100;
-  uint32_t mass;
-  float temp = integer + fraction/100.0;
-
-  temp = temp/scale_slope;
-  mass = temp;
-
-  return mass * 100;
-}
-
-/*static float average(uint16_t* buf, uint16_t size)
-{
-  uint16_t i;
-  float avg = 0;
-
-  for(i = 0; i < size; i++)
-  {
-    avg += buf[i];
-  }
-
-  return avg/size;
-}*/
 
 static void push(uint16_t* buffer, uint16_t size, uint16_t element)
 {

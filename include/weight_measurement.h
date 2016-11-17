@@ -10,23 +10,20 @@
 
 #include "types.h"
 
-/*
- *  Return the output votlage of the strain gauge Wheatstone bridge in milivolts.
- */
-uint16_t r_wheatstone_bridge(uint16_t mcu_vcc);
+extern boolean_t scale_sampling_done = False;
 
-uint16_t process_bridge_output(uint16_t value);
+typedef void (*scale_callback_t)(void);
 
 /*
  * Set the null point and initialize the averaging filter's buffer
  */
 void scale_init();
 
-float averaging_filter(uint16_t input);
-
 /*
  * Returns the mass in g, input is a processed value in mV
  */
-uint32_t mass_in_g(float input);
+uint32_t measure_mass(uint16_t mcu_vcc);
+uint32_t r_hive_mass(void);
+uint16_t start_scale_sampling(uint16_t mcu_vcc);
 
 #endif /* WEIGHT_MEASUREMENT_H_ */
