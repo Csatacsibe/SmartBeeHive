@@ -24,6 +24,6 @@ void scale_init();
  */
 uint32_t measure_mass(uint16_t mcu_vcc);
 uint32_t r_hive_mass(void);
-uint16_t start_scale_sampling(uint16_t mcu_vcc);
+void start_scale_sampling(uint16_t mcu_vcc);
 
 #endif /* WEIGHT_MEASUREMENT_H_ */

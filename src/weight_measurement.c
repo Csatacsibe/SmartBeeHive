@@ -82,7 +82,7 @@ static uint32_t convert_to_gram(float input)
   return mass * 100;
 }
 
-uint16_t start_scale_sampling(uint16_t mcu_vcc)
+void start_scale_sampling(uint16_t mcu_vcc)
 {
   vcc = mcu_vcc;
   scale_sampling_done = False;
