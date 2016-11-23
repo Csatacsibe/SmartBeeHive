@@ -14,7 +14,7 @@
 uint8_t rx_buffer_SIM808[160];
 boolean_t rx_cmplt = False, rx_error = False;
 uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
-callback_t *rx_callback = NULL;
+callback_t rx_callback = NULL;
 
 static boolean_t powered = False;
 
@@ -54,7 +54,7 @@ uint16_t put_s_SIM808(char* string)
   return size;
 }
 
-void get_s_SIM808(uint8_t cr_lmt, callback_t *callback)
+void get_s_SIM808(uint8_t cr_lmt, callback_t callback)
 {
   cr_limit = cr_lmt;
   rx_callback = callback;

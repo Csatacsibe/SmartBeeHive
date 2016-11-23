@@ -187,8 +187,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
   if(AdcHandle->Instance == ADC1)
   {
     HAL_ADC_Stop_DMA(AdcHandle);
-    config_ext_channel_ADC(STRAIN_GAUGE, False);
-    scale_sampling_done = True;
+    if(scale_callback != NULL)
+    {
+      scale_callback();
+    }
   }
 }
 

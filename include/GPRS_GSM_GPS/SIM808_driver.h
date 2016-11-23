@@ -15,7 +15,7 @@ typedef void (*callback_t)(char* data);
 extern uint8_t rx_buffer_SIM808[160];
 extern boolean_t rx_cmplt, rx_error;
 extern uint8_t rx_cnt, cr_cnt, cr_limit;
-extern callback_t *rx_callback;
+extern callback_t rx_callback;
 
 uint16_t length(char* message);
 
@@ -65,7 +65,7 @@ uint16_t put_s_SIM808(char* string);
  * @cr_lmt: number of '\r' to be received before rx complete
  * @callback: function to be called to process
  */
-void get_s_SIM808(uint8_t cr_lmt, callback_t *callback);
+void get_s_SIM808(uint8_t cr_lmt, callback_t callback);
 
 boolean_t is_powered_SIM808(void);
 

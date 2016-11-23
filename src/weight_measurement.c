@@ -23,7 +23,11 @@ static uint32_t mass = 0;
 static uint32_t input_buffer[SAMPLE_NUMBER];
 static uint16_t vcc = 2800;
 
+uint16_t scale_raw;
+float output;
+
 boolean_t scale_sampling_done = False;
+scale_callback_t scale_callback = NULL;
 
 //static float average(uint16_t* buf, uint16_t size);
 static void push(uint16_t* buffer, uint16_t size, uint16_t element);
@@ -35,11 +39,18 @@ static uint32_t convert_to_gram(float input);
 
 void scale_init()
 {
-  uint8_t i;
+  uint16_t i;
   uint16_t mcu_vcc;
+  uint32_t sum = 0;
 
   mcu_vcc = calculate_MCU_vcc();
-  unloaded = r_wheatstone_bridge(mcu_vcc);  // set null point
+
+  for(i = 0; i < 500; i++)
+  {
+    sum += r_wheatstone_bridge(mcu_vcc);  // set null point
+  }
+
+  unloaded = sum/500;
 
   for(i = 0; i < WINDOW_SIZE; i++)
   {
@@ -49,7 +60,7 @@ void scale_init()
 
 uint32_t measure_mass(uint16_t mcu_vcc)
 {
-  uint16_t scale_raw;
+  //uint16_t scale_raw;
   float scale_averaged;
 
   scale_raw = process_bridge_output(r_wheatstone_bridge(mcu_vcc));
@@ -61,6 +72,35 @@ uint32_t measure_mass(uint16_t mcu_vcc)
 uint32_t r_hive_mass()
 {
   return mass;
+}
+
+void start_scale_sampling(uint16_t mcu_vcc)
+{
+  vcc = mcu_vcc;
+  scale_sampling_done = False;
+  scale_callback = &process_scale_samples;
+  config_ext_channel_ADC(STRAIN_GAUGE, True);
+  HAL_ADCEx_Calibration_Start(&hadc);
+  HAL_ADC_Start_DMA(&hadc, input_buffer, SAMPLE_NUMBER);
+}
+
+void process_scale_samples(void)
+{
+  config_ext_channel_ADC(STRAIN_GAUGE, False);
+  scale_sampling_done = True;
+
+  uint16_t i, voltage, raw;
+  float averaged;
+
+
+  for(i = 0; i < SAMPLE_NUMBER; i++)
+  {
+    voltage = (vcc/4095.0) * input_buffer[i];
+    raw = process_bridge_output(voltage);
+    averaged = averaging_filter(raw);
+
+    mass = convert_to_gram(averaged);
+  }
 }
 
 static uint32_t convert_to_gram(float input)
@@ -82,15 +122,6 @@ static uint32_t convert_to_gram(float input)
   return mass * 100;
 }
 
-void start_scale_sampling(uint16_t mcu_vcc)
-{
-  vcc = mcu_vcc;
-  scale_sampling_done = False;
-  config_ext_channel_ADC(STRAIN_GAUGE, True);
-  HAL_ADCEx_Calibration_Start(&hadc);
-  HAL_ADC_Start_DMA(&hadc, input_buffer, SAMPLE_NUMBER);
-}
-
 /*static float average(uint16_t* buf, uint16_t size)
 {
   uint16_t i;
@@ -106,7 +137,7 @@ void start_scale_sampling(uint16_t mcu_vcc)
 
 static uint16_t r_wheatstone_bridge(uint16_t mcu_vcc)
 {
-  float output;
+  //float output;
   uint16_t digital_val;
 
   digital_val = r_single_ext_channel_ADC(STRAIN_GAUGE);
