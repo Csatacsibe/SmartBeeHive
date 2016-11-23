@@ -30,8 +30,7 @@
 void SystemClock_Config(void);
 static void reset_debug_input(void);
 
-volatile uint16_t scale_raw, user_input = 65535;
-volatile float scale_averaged;
+volatile uint16_t user_input = 65535;
 
 device_t device;
 hive_data_t hive;
@@ -76,7 +75,7 @@ int main(void)
     hive.mass = measure_mass(device.MCU_vcc);
     r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
-    if(is_powered_SIM808())
+    /*if(is_powered_SIM808())
     {
       cmd_vcc_SIM808();
       HAL_Delay(20);
@@ -85,9 +84,9 @@ int main(void)
     else
     {
       ext_LED(TOGGLE);
-    }
+    }*/
 
-    if(r_push_button())
+    /*if(r_push_button())
     {
       toggle_switch_state();
       power_SIM808();
@@ -100,7 +99,7 @@ int main(void)
     else
     {
 
-    }
+    }*/
 
     switch(user_input)
     {
