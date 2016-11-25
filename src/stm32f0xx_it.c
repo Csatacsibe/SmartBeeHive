@@ -11,6 +11,8 @@
 #include <weight_measurement.h>
 #include <STM32_bsp/adc.h>
 
+#include "string.h"
+
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_it.h"
@@ -126,7 +128,19 @@ void USART1_IRQHandler()
           huart1.State = HAL_UART_STATE_READY;
         }
 
-        process_response_SIM808();
+        if(rx_callback_SIM808 != NULL)
+        {
+          char* data = (char*)rx_buffer_SIM808;
+
+          if(strstr(data, "OK") != NULL)
+          {
+            rx_callback_SIM808(data);
+          }
+          else
+          {
+            rx_error = True;
+          }
+        }
       }
     }
 

@@ -13,36 +13,8 @@
 static float temperature = 0;
 static uint16_t vcc = 0;
 
-void process_response_SIM808()
-{
-  char* data = (char*)rx_buffer_SIM808;
-
-  if(strstr(data, "OK") != NULL)
-  {
-    if(strstr(data, "+CMTE") != NULL)
-    {
-      rx_error = False;
-      process_tmp_reading_SIM808(data);
-    }
-    else if(strstr(data, "+CBC") != NULL)
-    {
-      rx_error = False;
-      process_vcc_reading_SIM808(data);
-    }
-    else if(strstr(data, "+CMGS") != NULL)
-    {
-      rx_error = False;
-    }
-    else
-    {
-      rx_error = True;
-    }
-  }
-  else
-  {
-    rx_error = True;
-  }
-}
+static void process_tmp_reading_SIM808(char* data);
+static void process_vcc_reading_SIM808(char* data);
 
 void set_netlight(uint8_t value)
 {
@@ -60,7 +32,7 @@ uint8_t get_netlight()
 void cmd_tmp_SIM808()
 {
   put_s_SIM808("AT+CMTE?\r");
-  get_s_SIM808(4, NULL);
+  get_s_SIM808(4, process_tmp_reading_SIM808);
 }
 
 float r_temperature_SIM808()
@@ -68,8 +40,14 @@ float r_temperature_SIM808()
   return temperature;
 }
 
-void process_tmp_reading_SIM808(char* data)
+static void process_tmp_reading_SIM808(char* data)
 {
+  if(strstr(data, "+CMTE") == NULL)
+  {
+    rx_error = False;
+    return;
+  }
+
   while(data[0] != ',')
   {
     data++;
@@ -87,12 +65,18 @@ uint16_t r_vcc_SIM808(void)
 void cmd_vcc_SIM808(void)
 {
   put_s_SIM808("AT+CBC\r");
-  get_s_SIM808(4, NULL);
+  get_s_SIM808(4, process_vcc_reading_SIM808);
 }
 
-void process_vcc_reading_SIM808(char* data)
+static void process_vcc_reading_SIM808(char* data)
 {
-  int i = 0;
+  if(strstr(data, "+CBC") == NULL)
+  {
+    rx_error = False;
+    return;
+  }
+
+  uint8_t i = 0;
 
   while(i != 2)
   {
