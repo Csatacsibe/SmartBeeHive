@@ -88,7 +88,7 @@ uint16_t r_supply_current(uint16_t mcu_vcc)
 float r_MCU_temp(uint16_t mcu_vcc)
 {
   float temp;
-  float slope = ((110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR)))/1000.0;
+  float slope = ((110.0 - 30.0)/((*TEMP110_CAL_ADDR) - (*TEMP30_CAL_ADDR)));
 
   uint16_t ts_data = r_single_int_channel_ADC(ADC_CHANNEL_TEMPSENSOR);
 
