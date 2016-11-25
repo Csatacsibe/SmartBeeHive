@@ -75,21 +75,9 @@ int main(void)
     hive.mass = measure_mass(device.MCU_vcc);
     r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
-    /*if(is_powered_SIM808())
+    if(r_push_button())
     {
-      cmd_vcc_SIM808();
-      HAL_Delay(20);
       cmd_tmp_SIM808();
-    }
-    else
-    {
-      ext_LED(TOGGLE);
-    }*/
-
-    /*if(r_push_button())
-    {
-      toggle_switch_state();
-      power_SIM808();
     }
 
     if(get_switch_state())
@@ -99,7 +87,7 @@ int main(void)
     else
     {
 
-    }*/
+    }
 
     switch(user_input)
     {
@@ -108,6 +96,14 @@ int main(void)
         break;
       case 2:
         power_SIM808();
+        reset_debug_input();
+        break;
+      case 55:
+        reset_SIM808();
+        reset_debug_input();
+        break;
+      case 44:
+        put_s_SIM808("ATE0\r");
         reset_debug_input();
         break;
       case 3:
