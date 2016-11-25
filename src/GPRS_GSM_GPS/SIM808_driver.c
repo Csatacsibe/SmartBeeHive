@@ -14,7 +14,7 @@
 uint8_t rx_buffer_SIM808[160];
 boolean_t rx_cmplt = False, rx_error = False;
 uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
-callback_t rx_callback = NULL;
+SIM808_rx_callback_t rx_callback_SIM808 = NULL;
 
 static boolean_t powered = False;
 
@@ -54,10 +54,10 @@ uint16_t put_s_SIM808(char* string)
   return size;
 }
 
-void get_s_SIM808(uint8_t cr_lmt, callback_t callback)
+void get_s_SIM808(uint8_t cr_lmt, SIM808_rx_callback_t callback)
 {
   cr_limit = cr_lmt;
-  rx_callback = callback;
+  rx_callback_SIM808 = callback;
 
   HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 1);
 }
