@@ -25,5 +25,18 @@
  * AT+CGNSTST Send data received from GNSS to AT UART
  */
 
+#include "types.h"
+
+typedef struct GPS_data
+{
+  boolean_t valid;
+
+  float longitude;
+  float latitude;
+  float speed_over_ground;
+}GPS_data_t;
+
+void enable_GPS(boolean_t enable);
+GPS_data_t get_data_GPS(void);
 
 #endif /* GPRS_GSM_GPS_SIM808_GPS_H_ */
