@@ -11,6 +11,8 @@
 #include <weight_measurement.h>
 #include <STM32_bsp/adc.h>
 
+#include <logger.h>
+
 #include "string.h"
 
 #include "stm32f0xx_hal.h"
@@ -175,6 +177,8 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   if(hrtc->Instance == RTC)
   {
     measure_RTC_1min();
+
+    update_state_logger();
   }
 }
 

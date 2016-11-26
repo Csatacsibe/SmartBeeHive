@@ -5,12 +5,14 @@
  *      Author: Bence
  */
 
-#include <device_management.h>
 #include <weight_measurement.h>
 #include <power_management.h>
+
 #include <STM32_bsp/adc.h>
 #include <STM32_bsp/constants.h>
 #include <STM32_bsp/gpio.h>
+
+#include <logger.h>
 
 #define WINDOW_SIZE   48
 #define SAMPLE_NUMBER (uint32_t) 300
@@ -20,8 +22,7 @@ static float scale_slope = 2.6; // 2.6 mV / 100 g
 static uint16_t unloaded = 0;
 static uint16_t filter_buffer[WINDOW_SIZE];
 static uint32_t mass = 0;
-static uint32_t input_buffer[SAMPLE_NUMBER];
-static uint16_t vcc = 2800;
+static uint32_t input_buffer[SAMPLE_NUMBER] = {0};
 
 uint16_t scale_raw;
 float output;
@@ -74,9 +75,8 @@ uint32_t r_hive_mass()
   return mass;
 }
 
-void start_scale_sampling(uint16_t mcu_vcc)
+void start_scale_sampling()
 {
-  vcc = mcu_vcc;
   scale_sampling_done = False;
   scale_callback = &process_scale_samples;
   config_ext_channel_ADC(STRAIN_GAUGE, True);
@@ -95,7 +95,7 @@ void process_scale_samples(void)
 
   for(i = 0; i < SAMPLE_NUMBER; i++)
   {
-    voltage = (vcc/4095.0) * input_buffer[i];
+    voltage = (device.MCU_vcc/4095.0) * input_buffer[i];
     raw = process_bridge_output(voltage);
     averaged = averaging_filter(raw);
 

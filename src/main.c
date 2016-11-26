@@ -9,31 +9,22 @@
 #include "stm32f0xx_hal_cortex.h"
 #include "stm32f0xx_hal.h"
 
-/* STM32 peripherals */
-#include <STM32_bsp/adc.h>
-#include <STM32_bsp/gpio.h>
-#include <STM32_bsp/i2c.h>
-#include <STM32_bsp/usart.h>
-#include <STM32_bsp/rtc.h>
-
 /* SBH peripherals*/
-#include "power_management.h"
-#include "device_management.h"
-#include <weight_measurement.h>
-#include <gyroscope/FXAS21002C_driver.h>
+#include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <GPRS_GSM_GPS/SIM808_device.h>
-#include <hum_temp_sensor/Si7021_driver.h>
 
-#include "eeprom.h"
+#include <logger.h>
+
+#define DEBUG_VERSION
 
 void SystemClock_Config(void);
+
+#ifdef DEBUG_VERSION
 static void reset_debug_input(void);
+#endif
 
 volatile uint16_t user_input = 65535;
-
-device_t device;
-hive_data_t hive;
 
 int main(void)
 {
@@ -44,18 +35,10 @@ int main(void)
   SystemClock_Config();
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  //MX_DMA_Init();
-  MX_ADC_Init();
-  MX_I2C1_Init();
-  MX_USART1_UART_Init();
-  MX_RTC_Init();
+  init_BSP();
 
   /* Initialize SBH peripherals */
-  power_mngt_init();
-  SIM808_init();
-  FXAS21002C_init();
-  scale_init();
+  init_board();
 
   //__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
@@ -64,129 +47,122 @@ int main(void)
 
   while (1)
   {
-    device.MCU_vcc            = calculate_MCU_vcc();
-    device.vbat               = r_battery_voltage(device.MCU_vcc);
-    device.current            = r_supply_current(device.MCU_vcc);
-    device.MCU_temperature    = r_MCU_temp(device.MCU_vcc);
-    device.charger_status     = r_charger_stat();
-    device.SIM808_temperature = r_temperature_SIM808();
-    device.SIM808_vcc         = r_vcc_SIM808();
+    logger_state_machine();
 
-    hive.mass = measure_mass(device.MCU_vcc);
-    r_both_Si7021(&(hive.humidity), &(hive.temperature));
+    #ifdef DEBUG_VERSION
 
-    if(r_push_button())
-    {
-      cmd_tmp_SIM808();
-    }
+      if(r_push_button())
+      {
 
-    if(get_switch_state())
-    {
+      }
 
-    }
-    else
-    {
+      if(get_switch_state())
+      {
 
-    }
+      }
+      else
+      {
 
-    switch(user_input)
-    {
-      case 1:
-        ext_LED(TOGGLE);
-        break;
-      case 2:
-        power_SIM808();
-        reset_debug_input();
-        break;
-      case 55:
-        reset_SIM808();
-        reset_debug_input();
-        break;
-      case 44:
-        put_s_SIM808("ATE0\r");
-        reset_debug_input();
-        break;
-      case 3:
-      {
-        put_s_SIM808("AT\r");
-        reset_debug_input();
-        break;
       }
-      case 5:
+
+      switch(user_input)
       {
-        cmd_tmp_SIM808();
-        reset_debug_input();
-        break;
+        case 1:
+          ext_LED(TOGGLE);
+          break;
+        case 2:
+          power_SIM808();
+          reset_debug_input();
+          break;
+        case 55:
+          reset_SIM808();
+          reset_debug_input();
+          break;
+        case 44:
+          put_s_SIM808("ATE0\r");
+          reset_debug_input();
+          break;
+        case 3:
+        {
+          put_s_SIM808("AT\r");
+          reset_debug_input();
+          break;
+        }
+        case 5:
+        {
+          cmd_tmp_SIM808();
+          reset_debug_input();
+          break;
+        }
+        case 6:
+        {
+          cmd_vcc_SIM808();
+          reset_debug_input();
+          break;
+        }
+        case 7:
+        {
+          reset_debug_input();
+          break;
+        }
+        case 8:
+        {
+          reset_debug_input();
+          break;
+        }
+        case 9:
+        {
+          put_s_SIM808("AT+CANT=1,1,10\r");
+          reset_debug_input();
+          break;
+        }
+        case 10:
+        {
+          put_s_SIM808("AT+CSQ\r"); // signal strength
+          reset_debug_input();
+          break;
+        }
+        case 11:
+        {
+          put_s_SIM808("AT+CPOL?\r"); // preferred operator list
+          reset_debug_input();
+          break;
+        }
+        case 12:
+        {
+          put_s_SIM808("AT+COPN\r"); // read operator names
+          reset_debug_input();
+          break;
+        }
+        case 13:
+        {
+          put_s_SIM808("AT+CSPN?\r"); // AT+CSPN Get Service Provider Name from SIM
+          reset_debug_input();
+          break;
+        }
+        case 14:
+        {
+          put_s_SIM808("AT+COPS?\r");
+          reset_debug_input();
+          break;
+        }
+        case 15:
+        {
+          put_s_SIM808("AT+CMEE=2\r"); // Enable +CME ERROR: <err> result code and use verbose <err> values
+          reset_debug_input();
+          break;
+        }
+        case 16:
+        {
+          put_s_SIM808("AT&W\r"); // save config
+          reset_debug_input();
+          break;
+        }
+        default:
+          break;
       }
-      case 6:
-      {
-        cmd_vcc_SIM808();
-        reset_debug_input();
-        break;
-      }
-      case 7:
-      {
-        enable_4V2_converter(False);
-        reset_debug_input();
-        break;
-      }
-      case 8:
-      {
-        enable_4V2_converter(True);
-        reset_debug_input();
-        break;
-      }
-      case 9:
-      {
-        put_s_SIM808("AT+CANT=1,1,10\r");
-        reset_debug_input();
-        break;
-      }
-      case 10:
-      {
-        put_s_SIM808("AT+CSQ\r"); // signal strength
-        reset_debug_input();
-        break;
-      }
-      case 11:
-      {
-        put_s_SIM808("AT+CPOL?\r"); // preferred operator list
-        reset_debug_input();
-        break;
-      }
-      case 12:
-      {
-        put_s_SIM808("AT+COPN\r"); // read operator names
-        reset_debug_input();
-        break;
-      }
-      case 13:
-      {
-        put_s_SIM808("AT+CSPN?\r"); // AT+CSPN Get Service Provider Name from SIM
-        reset_debug_input();
-        break;
-      }
-      case 14:
-      {
-        put_s_SIM808("AT+COPS?\r");
-        reset_debug_input();
-        break;
-      }
-      case 15:
-      {
-        put_s_SIM808("AT+CMEE=2\r"); // Enable +CME ERROR: <err> result code and use verbose <err> values
-        reset_debug_input();
-        break;
-      }
-      case 16:
-      {
-        put_s_SIM808("AT&W\r"); // save config
-        reset_debug_input();
-        break;
-      }
-      default:
-        break;
-    }
+
+    #endif
   }
 }
 
@@ -230,11 +206,15 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
+#ifdef DEBUG_VERSION
+
 static void reset_debug_input()
 {
     user_input = 65535;
     ext_LED(TOGGLE);
 }
+
+#endif
 
 #ifdef USE_FULL_ASSERT
 
