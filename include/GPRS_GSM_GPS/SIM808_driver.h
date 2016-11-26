@@ -24,14 +24,7 @@ uint16_t length(char* message);
  */
 void SIM808_init(void);
 
-/*
- *  Power ON/OFF GPS antenna.
- *
- *  @param val:
- *       True  = power on
- *       False = power off
- */
-void GPS_ant_pwr(boolean_t val);
+void enable_GPS_antenna(boolean_t val);
 
 /*
  *  Drives PWRKEY low for 1.1 second to turn ON/OFF the module.

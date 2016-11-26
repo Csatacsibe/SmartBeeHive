@@ -101,7 +101,7 @@ float r_MCU_temp(uint16_t mcu_vcc)
 void enter_mode(power_saving_mode_t mode)
 {
   enable_4V2_converter(False);
-  GPS_ant_pwr(False);
+  enable_GPS_antenna(False);
 
   HAL_SuspendTick();
 
