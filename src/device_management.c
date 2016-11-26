@@ -5,9 +5,21 @@
  *      Author: Bence
  */
 
+/* STM32 peripherals */
+#include <STM32_bsp/adc.h>
+#include <STM32_bsp/gpio.h>
+#include <STM32_bsp/i2c.h>
+#include <STM32_bsp/usart.h>
+#include <STM32_bsp/rtc.h>
+
+#include <gyroscope/FXAS21002C_driver.h>
+#include <GPRS_GSM_GPS/SIM808_driver.h>
+#include <power_management.h>
+#include <weight_measurement.h>
+
 #include "device_management.h"
 #include "math.h"
-
+#include "logger.h"
 
 static volatile boolean_t switch_state = False;
 static volatile uint32_t rtc_min_val = 0;
@@ -17,6 +29,29 @@ static volatile uint32_t rtc_min_val = 0;
  */
 static volatile uint32_t prev_tick = 0;
 static volatile uint32_t rtc_min_cntr = 0;
+
+/***************************************************************************/
+void init_BSP()
+{
+  MX_GPIO_Init();
+  //MX_DMA_Init();
+  MX_ADC_Init();
+  MX_I2C1_Init();
+  MX_USART1_UART_Init();
+  MX_RTC_Init();
+}
+
+void init_board()
+{
+  power_mngt_init();
+  SIM808_init();
+  FXAS21002C_init();
+  scale_init();
+
+  refresh_device_data();
+}
+
+/***************************************************************************/
 
 boolean_t waitFor(boolean_t* flag, uint32_t timeout)
 {
