@@ -21,19 +21,22 @@ typedef struct device
 {
   uint16_t vbat;
   uint16_t current;
-  uint16_t MCU_vcc;
-  uint16_t SIM808_vcc;
 
+  boolean_t charger;
+
+  uint16_t MCU_vcc;
   int8_t MCU_temperature;
-  int8_t GYRO_temperature;
+
+  uint16_t SIM808_vcc;
   float SIM808_temperature;
 
+  int8_t GYRO_temperature;
 }device_t;
 
 extern device_t device;
 
 void update_state_logger(void);
-void logger_state_machine(void);
 void refresh_device_data(void);
+void log_hive_data(uint8_t log_cycle);
 
 #endif /* LOGGER_H_ */
