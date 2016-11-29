@@ -266,7 +266,7 @@ FXAS21002C_ODR_t r_ODR_FXAS21002C()
   }
 }
 
-void s_RTD_on_axis_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable)
+void enable_RT_event_FXAS21002C(FXAS21002C_axis_t axis, boolean_t enable)
 {
   uint8_t reg;
   r_regs_FXAS21002C(RT_CFG, 1, &reg);
