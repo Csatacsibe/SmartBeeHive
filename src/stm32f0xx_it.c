@@ -11,7 +11,7 @@
 #include <weight_measurement.h>
 #include <STM32_bsp/adc.h>
 
-#include <logger.h>
+#include <state_machine.h>
 
 #include "string.h"
 
@@ -178,7 +178,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   {
     measure_RTC_1min();
 
-    update_state_logger();
+    inc_wake_up_counter();
   }
 }
 
@@ -186,12 +186,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if( GPIO_Pin == CHG_STAT_Pin)
   {
-
+    // TODO: handle charger
   }
 
   if( GPIO_Pin == GY_INT1_Pin)
   {
-
+    if(state_SBH != ALARM_THEFT)
+    {
+      //state_SBH = ALARM_RAISED;
+    }
   }
 
   if( GPIO_Pin == GY_INT2_Pin)

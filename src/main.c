@@ -9,19 +9,24 @@
 #include "stm32f0xx_hal_cortex.h"
 #include "stm32f0xx_hal.h"
 
-/* SBH peripherals*/
 #include <device_management.h>
+#include <power_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
-#include <GPRS_GSM_GPS/SIM808_device.h>
+
+#include <GPRS_GSM_GPS/SIM808_GPS.h>
 
 #include <logger.h>
+#include <gyroscope/alarm.h>
+#include <state_machine.h>
 
 #define DEBUG_VERSION
 
 void SystemClock_Config(void);
 
 #ifdef DEBUG_VERSION
-static void reset_debug_input(void);
+  #include <GPRS_GSM_GPS/SIM808_device.h>
+
+  static void reset_debug_input(void);
 #endif
 
 volatile uint16_t user_input = 65535;
@@ -45,9 +50,126 @@ int main(void)
   //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
   //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
+  /* Initialize application*/
+  //configure_alarm(200, 300);   // alarm over 200 °/s with 300 ms debounce time
+  //enable_alarm(True);
+
+  init_state_machine();
+  uint8_t cycle = get_wake_up_cycle();
+
   while (1)
   {
-    logger_state_machine();
+    cycle = get_wake_up_cycle();
+
+    switch(state_SBH)
+    {
+      case LOGGING:
+      {
+        if(0 < cycle && cycle < LOG_PERIOD)
+        {
+          log_hive_data(cycle);
+        }
+        else
+        {
+          log_hive_data(cycle);
+          refresh_device_data();
+          // TODO: power SIM808, send data, power off SIM808
+        }
+
+        enter_mode(STOP);
+      }
+        break;
+      case ALARM_RAISED:
+      {
+        if(False == is_powered_SIM808())
+        {
+          power_SIM808();
+        }
+        else
+        {
+          if(False == get_state_GPS())
+          {
+            enable_GPS(True);
+          }
+          else
+          {
+            identify_alarm_event(300);
+          }
+        }
+      }
+        break;
+      case ALARM_DISPLACEMENT:
+      {
+        static boolean_t flag = False;
+        if(!flag)
+        {
+          while(True != send_displacement_alarm_msg("+36306926201"));
+          flag = True;
+        }
+        else
+        {
+          power_SIM808();
+          enter_mode(STOP);
+        }
+      }
+        break;
+      case ALARM_THEFT:
+      {
+        static boolean_t flag = False;
+        if(cycle == 10 && flag == False)
+        {
+          while(True != send_theft_alarm_msg("+36306926201"));
+          flag = True;
+        }
+        else if(cycle != 10)
+        {
+          flag = False;
+        }
+      }
+        break;
+      case DEBUG_MONITORING:
+      {
+        log_hive_data(1);
+        refresh_device_data();
+      }
+        break;
+      default:
+        // Handle error
+        break;
+    }
+
+    reset_wake_up_counter();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     #ifdef DEBUG_VERSION
 
