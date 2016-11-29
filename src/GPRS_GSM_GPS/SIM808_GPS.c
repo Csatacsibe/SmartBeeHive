@@ -13,12 +13,18 @@
 
 static GPS_data_t gps_data = {0};
 static boolean_t ready = False;
+static boolean_t on = False;
 
 static void parse_GPS_data(char* data);
 static void skip_field(char** pointer);
 static int8_t get_sign(char** pointer);
 static void get_digits_num(uint8_t* digits, char delimiter, char* data);
 static void parse_coordinate_fraction(float* coorindate, char** pointer);
+
+boolean_t get_state_GPS()
+{
+  return on;
+}
 
 void enable_GPS(boolean_t enable)
 {
@@ -28,11 +34,13 @@ void enable_GPS(boolean_t enable)
     put_s_SIM808("AT+CGNSPWR=1\r");
     HAL_Delay(100);
     put_s_SIM808("AT+CGNSSEQ=\"RMC\"\r");
+    on = True;
   }
   else
   {
     put_s_SIM808("AT+CGNSPWR=0\r");
     enable_GPS_antenna(False);
+    on = False;
   }
 }
 
