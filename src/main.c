@@ -14,12 +14,13 @@
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
 #include <GPRS_GSM_GPS/SIM808_GPS.h>
+#include <GPRS_GSM_GPS/SIM808_GPRS.h>
 
 #include <logger.h>
 #include <gyroscope/alarm.h>
 #include <state_machine.h>
 
-//#define DEBUG_VERSION
+#define DEBUG_VERSION
 
 void SystemClock_Config(void);
 
@@ -50,11 +51,13 @@ int main(void)
   //enable_alarm(True);
 
   init_state_machine();
+  init_GPRS();
   uint8_t cycle = get_wake_up_cycle();
 
   while (1)
   {
     cycle = get_wake_up_cycle();
+    charge_control(device.vbat);
 
     switch(state_SBH)
     {
@@ -68,16 +71,33 @@ int main(void)
         {
           log_hive_data(cycle);
           refresh_device_data();
-          // TODO: power SIM808, send data, power off SIM808
-        }
 
-        enter_mode(STOP);
+          uint32_t size = sizeof(hive_data_t) * LOG_PERIOD;
+          char packet[size];
+
+          create_packet(packet);
+
+          enable_4V2_converter(True);
+          power_SIM808();
+          HAL_Delay(100);
+
+          if(connect_GPRS(5000))
+          {
+            upload_data_GPRS(packet, size, 10000);
+          }
+
+          disconnect_GPRS(5000);
+
+          power_SIM808();
+          enter_mode(STOP);
+        }
       }
         break;
       case ALARM_RAISED:
       {
         if(False == is_powered_SIM808())
         {
+          enable_4V2_converter(True);
           power_SIM808();
         }
         else
@@ -88,7 +108,7 @@ int main(void)
           }
           else
           {
-            identify_alarm_event(300);
+            identify_alarm_event(150);
           }
         }
       }
@@ -103,7 +123,11 @@ int main(void)
         }
         else
         {
-          power_SIM808();
+          if(True == is_powered_SIM808())
+          {
+            enable_GPS(False);
+            power_SIM808();
+          }
           enter_mode(STOP);
         }
       }
@@ -189,10 +213,6 @@ int main(void)
           break;
         case 2:
           power_SIM808();
-          reset_debug_input();
-          break;
-        case 55:
-          reset_SIM808();
           reset_debug_input();
           break;
         case 44:
