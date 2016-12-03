@@ -109,12 +109,12 @@ boolean_t disconnect_GPRS(uint32_t timeout)
   return ret;
 }
 
-boolean_t download_data_GPRS(char* data, uint32_t timeout)
+boolean_t upload_data_GPRS(char* data, uint32_t size, uint32_t timeout)
 {
   char cmd[50] = {0};
   boolean_t ret = False;
 
-  snprintf(cmd, 49, "AT+HTTPDATA=%d,%d\r", length(data), (int)timeout);
+  snprintf(cmd, 49, "AT+HTTPDATA=%d,%d\r", (int)size, (int)timeout);
   put_s_SIM808(cmd);
 
   while('D' != get_c_SIM808()); // TODO: timeout
