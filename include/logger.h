@@ -38,5 +38,6 @@ extern device_t device;
 void update_state_logger(void);
 void refresh_device_data(void);
 void log_hive_data(uint8_t log_cycle);
+void create_packet(char* packet);
 
 #endif /* LOGGER_H_ */

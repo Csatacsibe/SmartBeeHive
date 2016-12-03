@@ -14,6 +14,7 @@
 
 #include <GPRS_GSM_GPS/SIM808_device.h>
 #include <state_machine.h>
+#include <string.h>
 
 static hive_data_t hive_log[LOG_PERIOD] = {0};
 device_t device = {0};
@@ -42,4 +43,15 @@ void log_hive_data(uint8_t log_cycle)
   r_both_Si7021(&(hive.humidity), &(hive.temperature));
 
   hive_log[log_cycle - 1] = hive;
+}
+
+void create_packet(char* packet)
+{
+  uint8_t i = 0;
+
+  for(i = 0; i < LOG_PERIOD; i++)
+  {
+    memcpy(packet, &(hive_log[i]), sizeof(hive_data_t));
+    packet += sizeof(hive_data_t);
+  }
 }
