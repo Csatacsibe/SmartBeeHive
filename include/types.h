@@ -16,10 +16,4 @@ typedef enum boolean
 	False = 0
 }boolean_t;
 
-typedef enum io_operation
-{
-	set_bit,
-	reset_bit
-}io_operation_t;
-
 #endif /* TYPES_H_ */
