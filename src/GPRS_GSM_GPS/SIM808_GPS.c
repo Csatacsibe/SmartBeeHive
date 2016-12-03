@@ -7,6 +7,7 @@
 
 #include <GPRS_GSM_GPS/SIM808_GPS.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
+#include <GPRS_GSM_GPS/SIM808_device.h>
 
 #include <device_management.h>
 #include "string.h"
@@ -60,9 +61,8 @@ static void parse_GPS_data(char* data)
     int8_t sign = 1;
     uint8_t digits = 0;
 
-    if(strstr(data, "+CGNSINF") == NULL)
+    if(check_msg_header_SIM808(data, "+CGNSINF") == False)
     {
-        rx_error = False;
         ready = False;
     }
     else

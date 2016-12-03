@@ -7,6 +7,7 @@
 
 #include "GPRS_GSM_GPS/SIM808_GSM.h"
 #include "GPRS_GSM_GPS/SIM808_driver.h"
+#include <GPRS_GSM_GPS/SIM808_device.h>
 
 #include "device_management.h"
 
@@ -22,14 +23,14 @@ boolean_t send_SMS(char* text, char* number)
     return False;
   }
 
-  char cmd[30];
+  char cmd[30] = {0};
   char ctrlZ = 0x1A; // <Ctrl + Z> in ASCII
   SMS_succes = False;
 
   sprintf(cmd,"AT+CMGS=\"%s\"\r", number);
   put_s_SIM808(cmd);
 
-  while('>' != get_c_SIM808());
+  while('>' != get_c_SIM808()); // TODO: timeout
 
   put_s_SIM808(text);
   put_c_SIM808(ctrlZ);
@@ -40,9 +41,8 @@ boolean_t send_SMS(char* text, char* number)
 
 static void check_SMS_sending_result(char* data)
 {
-  if(strstr(data, "+CMGS") == NULL)
+  if(check_msg_header_SIM808(data, "+CMGS") == False)
   {
-    rx_error = False;
     SMS_succes = False;
   }
   else
