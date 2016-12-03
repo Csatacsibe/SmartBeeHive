@@ -11,7 +11,7 @@
 #include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 
-uint8_t rx_buffer_SIM808[160];
+uint8_t rx_buffer_SIM808[200];
 boolean_t rx_cmplt = False, rx_error = False;
 uint8_t rx_cnt = 0, cr_cnt = 0, cr_limit = 2;
 SIM808_rx_callback_t rx_callback_SIM808 = NULL;
@@ -58,6 +58,7 @@ void get_s_SIM808(uint8_t cr_lmt, SIM808_rx_callback_t callback)
 {
   cr_limit = cr_lmt;
   rx_callback_SIM808 = callback;
+  rx_error = False;
 
   HAL_UART_Receive_IT(&huart1, rx_buffer_SIM808, 1);
 }

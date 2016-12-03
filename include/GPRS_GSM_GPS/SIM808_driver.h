@@ -12,7 +12,7 @@
 
 typedef void (*SIM808_rx_callback_t)(char* data);
 
-extern uint8_t rx_buffer_SIM808[160];
+extern uint8_t rx_buffer_SIM808[200];
 extern boolean_t rx_cmplt, rx_error;
 extern uint8_t rx_cnt, cr_cnt, cr_limit;
 extern SIM808_rx_callback_t rx_callback_SIM808;
