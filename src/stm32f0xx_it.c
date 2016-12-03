@@ -140,6 +140,7 @@ void USART1_IRQHandler()
           }
           else
           {
+            //TODO: error callback "+CME ERROR"
             rx_error = True;
           }
         }
