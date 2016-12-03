@@ -19,7 +19,7 @@
 #include <gyroscope/alarm.h>
 #include <state_machine.h>
 
-#define DEBUG_VERSION
+//#define DEBUG_VERSION
 
 void SystemClock_Config(void);
 
@@ -27,9 +27,9 @@ void SystemClock_Config(void);
   #include <GPRS_GSM_GPS/SIM808_device.h>
 
   static void reset_debug_input(void);
-#endif
 
-volatile uint16_t user_input = 65535;
+  volatile uint16_t user_input = 65535;
+#endif
 
 int main(void)
 {
@@ -44,11 +44,6 @@ int main(void)
 
   /* Initialize SBH peripherals */
   init_board();
-
-  //__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-
-  //__HAL_PWR_GET_FLAG(PWR_FLAG_WU);
-  //__HAL_PWR_GET_FLAG(PWR_FLAG_SB);
 
   /* Initialize application*/
   //configure_alarm(200, 300);   // alarm over 200 °/s with 300 ms debounce time
