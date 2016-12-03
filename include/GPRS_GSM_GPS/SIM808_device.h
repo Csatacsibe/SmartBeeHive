@@ -31,33 +31,13 @@
  */
 void set_netlight(uint8_t value);
 
-/*
- *  Returns the Net Light status
- *
- *  @retval:
- *  0 Net light closed
- *  1 Net light opened to shining
- */
-uint8_t get_netlight(void);
-
-/*
- * Returns temperature value °C
- */
 float r_temperature_SIM808(void);
-
-/*
- * Queries temperature by sending the appropriate AT command
- */
 void cmd_tmp_SIM808(void);
-
-/*
- * Returns vcc value in milivolts
- */
 uint16_t r_vcc_SIM808(void);
-
-/*
- * Queries vcc by sending the appropriate AT command
- */
 void cmd_vcc_SIM808(void);
+
+boolean_t is_SIM_registered_SIM808(void);
+
+boolean_t check_msg_header_SIM808(char* data, char* header);
 
 #endif /* GPRS_GSM_GPS_SIM808_DEVICE_H_ */
