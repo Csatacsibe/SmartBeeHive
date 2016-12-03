@@ -4,6 +4,7 @@
 #include <power_management.h>
 #include <device_management.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
+#include <state_machine.h>
 
 static float I_SENSE_GAIN = 0.7143;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
 static float FACTORY_CALIB_VDD = 3.31;
@@ -42,7 +43,14 @@ boolean_t r_charger_stat()
   {
     return False;
   }
+}
 
+void charge_control(uint16_t vbat)
+{
+  if(vbat < 4000)
+  {
+    enable_bat_charger(True);
+  }
 }
 
 void power_mngt_init()
@@ -102,6 +110,7 @@ void enter_mode(power_saving_mode_t mode)
 {
   enable_4V2_converter(False);
   enable_GPS_antenna(False);
+  reset_wake_up_counter();
 
   HAL_SuspendTick();
 

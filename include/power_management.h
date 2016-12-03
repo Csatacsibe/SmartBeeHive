@@ -21,22 +21,7 @@ typedef enum power_saving_mode
   STANDBY = 2
 }power_saving_mode_t;
 
-/*
- *  enable/disable ADP1613 DCDC converter
- *
- *  params:
- *  val: True  = enable
- *       False = disable
- */
 void enable_4V2_converter(boolean_t val);
-
-/*
- *  enable/disable MCP73832 LiPo charger
- *
- *  params:
- *  val: True  = enable
- *       False = disable
- */
 void enable_bat_charger(boolean_t val);
 
 /*
@@ -46,38 +31,12 @@ void enable_bat_charger(boolean_t val);
  *          False: Preconditioning, Constant-Current Fast Charge, Constant Voltage
  */
 boolean_t r_charger_stat(void);
-
-/*
- *  set default pin values
- */
 void power_mngt_init(void);
-
-/*
- * Reads the internal voltage reference,
- * the internal reference voltage calibration
- * value and calculates the supply voltage in milivolts.
- */
 uint16_t calculate_MCU_vcc(void);
-
-/*
- * Returns the battery voltage in milivolts.
- */
 uint16_t r_battery_voltage(uint16_t mcu_vcc);
-
-/*
- * Returns the board supply current in mA.
- */
 uint16_t r_supply_current(uint16_t mcu_vcc);
-
-/*
- * Reads the MCU internal temperature sensor.
- * Returns the temperature in °C.
- */
 float r_MCU_temp(uint16_t mcu_vcc);
-
-/*
- * The MCU enters the power saving mode selected by @param mode.
- */
 void enter_mode(power_saving_mode_t mode);
+void charge_control(uint16_t vbat);
 
 #endif /* POWER_MANAGEMENT_H_ */

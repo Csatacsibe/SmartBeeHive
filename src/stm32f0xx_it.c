@@ -8,6 +8,7 @@
 #include <GPRS_GSM_GPS/SIM808_device.h>
 #include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <device_management.h>
+#include <power_management.h>
 #include <weight_measurement.h>
 #include <STM32_bsp/adc.h>
 
@@ -97,7 +98,7 @@ void USART1_IRQHandler()
         cr_cnt++;
       }
 
-      if(rx_cnt < 159)
+      if(rx_cnt < 199)
       {
         rx_buffer_SIM808[rx_cnt++] = byte;
       }
@@ -187,7 +188,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if( GPIO_Pin == CHG_STAT_Pin)
   {
-    // TODO: handle charger
+    if(r_charger_stat() == True)
+    {
+      enable_bat_charger(False);
+    }
   }
 
   if( GPIO_Pin == GY_INT1_Pin)
