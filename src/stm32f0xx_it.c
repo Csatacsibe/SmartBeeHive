@@ -179,7 +179,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   if(hrtc->Instance == RTC)
   {
     measure_RTC_1min();
-
+    diagnostic = True;
     inc_wake_up_counter();
   }
 }

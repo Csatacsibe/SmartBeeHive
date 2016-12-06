@@ -20,8 +20,6 @@
 #include <gyroscope/alarm.h>
 #include <state_machine.h>
 
-#define DEBUG_VERSION
-
 void SystemClock_Config(void);
 
 #ifdef DEBUG_VERSION
@@ -47,7 +45,7 @@ int main(void)
   init_board();
 
   /* Initialize application*/
-  //configure_alarm(200, 300);   // alarm over 200 °/s with 300 ms debounce time
+  //configure_alarm(100, 300);   // alarm over 200 °/s with 300 ms debounce time
   //enable_alarm(True);
 
   init_state_machine();
@@ -57,7 +55,13 @@ int main(void)
   while (1)
   {
     cycle = get_wake_up_cycle();
-    charge_control(device.vbat);
+
+    if(diagnostic)
+    {
+      refresh_device_data();
+      charge_control(device.vbat);
+      diagnostic = False;
+    }
 
     switch(state_SBH)
     {
@@ -70,12 +74,8 @@ int main(void)
         else
         {
           log_hive_data(cycle);
-          refresh_device_data();
 
-          uint32_t size = sizeof(hive_data_t) * LOG_PERIOD;
-          char packet[size];
 
-          create_packet(packet);
 
           enable_4V2_converter(True);
           power_SIM808();
@@ -83,14 +83,14 @@ int main(void)
 
           if(connect_GPRS(5000))
           {
-            upload_data_GPRS(packet, size, 10000);
+            send_records();
           }
 
           disconnect_GPRS(5000);
 
           power_SIM808();
-          enter_mode(STOP);
         }
+        enter_mode(STOP);
       }
         break;
       case ALARM_RAISED:

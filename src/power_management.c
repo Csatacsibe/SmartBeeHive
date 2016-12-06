@@ -9,6 +9,8 @@
 static float I_SENSE_GAIN = 0.7143;   // I_supply [mA] = V_sense[mV] * I_SENSE_GAIN[A/V]
 static float FACTORY_CALIB_VDD = 3.31;
 
+boolean_t diagnostic = False;
+
 void enable_4V2_converter(boolean_t val)
 {
   if(val == True)

@@ -14,6 +14,8 @@
 
 #include "types.h"
 
+extern boolean_t diagnostic;
+
 typedef enum power_saving_mode
 {
   SLEEP  = 0,
