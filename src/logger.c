@@ -11,9 +11,11 @@
 #include <gyroscope/FXAS21002C_driver.h>
 #include <weight_measurement.h>
 #include <power_management.h>
-
 #include <GPRS_GSM_GPS/SIM808_device.h>
+#include <GPRS_GSM_GPS/SIM808_GPRS.h>
+#include <GPRS_GSM_GPS/SIM808_driver.h>
 #include <state_machine.h>
+
 #include <string.h>
 
 static hive_data_t hive_log[LOG_PERIOD] = {0};
@@ -53,5 +55,19 @@ void create_packet(char* packet)
   {
     memcpy(packet, &(hive_log[i]), sizeof(hive_data_t));
     packet += sizeof(hive_data_t);
+  }
+}
+
+void send_records()
+{
+  uint8_t i;
+  char packet[50];
+
+  for(i = 0; i < LOG_PERIOD; i++)
+  {
+    memset(packet, 0, 50);
+    snprintf(packet, 49,"temperature=%.1f&humidity=%.0f&mass=%d",
+        hive_log[i].temperature, hive_log[i].humidity, (int)hive_log[i].mass);
+    upload_data_GPRS(packet, length(packet), 10000);
   }
 }

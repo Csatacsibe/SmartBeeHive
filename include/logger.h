@@ -39,5 +39,6 @@ void update_state_logger(void);
 void refresh_device_data(void);
 void log_hive_data(uint8_t log_cycle);
 void create_packet(char* packet);
+void send_records(void);
 
 #endif /* LOGGER_H_ */
