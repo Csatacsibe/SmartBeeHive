@@ -23,6 +23,8 @@ boolean_t send_SMS(char* text, char* number)
     return False;
   }
 
+  put_s_SIM808("AT+CMGF=1\r");
+
   char cmd[30] = {0};
   char ctrlZ = 0x1A; // <Ctrl + Z> in ASCII
   SMS_succes = False;

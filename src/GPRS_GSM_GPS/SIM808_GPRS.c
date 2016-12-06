@@ -193,7 +193,7 @@ static boolean_t configure_bearer(uint32_t timeout)
   if(!ret) return ret;
 
   // Set the APN - this will depend on your network/service provider
-  ret = cmd_SAPBR(3, gprs_info.cid, "APN", "wholesale", timeout);
+  ret = cmd_SAPBR(3, gprs_info.cid, "APN", "internet", timeout);
   if(!ret) return ret;
 
   // Enable GPRS - this will take a moment or two

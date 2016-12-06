@@ -13,7 +13,6 @@
 
 static float temperature = 0;
 static uint16_t vcc = 0;
-
 static boolean_t ok = False;
 
 static void process_CMTE_resp(char* data);

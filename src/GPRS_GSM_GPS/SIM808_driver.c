@@ -97,7 +97,6 @@ void SIM808_init()
   HAL_GPIO_WritePin(SIM_RST_GPIO_Port, SIM_RST_Pin, GPIO_PIN_SET);         // Sets GPIO to High-Z, externally pulled up
 
   enable_GPS_antenna(False);  // default value: GPS antenna power off
-  //configure_SIM808();  // send default configuration if the module is powered
 }
 
 
