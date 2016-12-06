@@ -10,6 +10,7 @@
 
 #include "types.h"
 
+#define DEBUG_VERSION
 #define LOG_PERIOD 10
 
 typedef enum smart_beehive_states

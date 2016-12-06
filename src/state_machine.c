@@ -14,7 +14,13 @@ static uint8_t wake_up_cnt = 0;
 void init_state_machine()
 {
   wake_up_cnt = 0;
-  state_SBH = DEBUG_MONITORING;//LOGGING;
+
+#ifdef DEBUG_VERSION
+  state_SBH = DEBUG_MONITORING;
+#else
+  state_SBH = LOGGING;
+#endif
+
 }
 
 void inc_wake_up_counter()
