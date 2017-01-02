@@ -239,11 +239,13 @@ int main(void)
         }
         case 7:
         {
+          enable_4V2_converter(True);
           reset_debug_input();
           break;
         }
         case 8:
         {
+          enable_4V2_converter(False);
           reset_debug_input();
           break;
         }
